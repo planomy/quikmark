@@ -8,19 +8,20 @@
         :root {
             --primary: #0284c7;
             --primary-hover: #0369a1;
-            --bg: #f8fafc; 
+            --bg: #f8fafc;
             --surface: #ffffff;
-            --border: #e2e8f0; 
+            --border: #e2e8f0;
             --text: #334155;
             --text-light: #64748b;
             --danger: #ef4444;
             --danger-hover: #dc2626;
-            --success: #059669;
+            --success: #0f766e;
+            --success-hover: #0d5f59;
             --magic: #8b5cf6; 
             --magic-hover: #7c3aed;
             --pending-bg: #f1f5f9;
             --pending-text: #64748b;
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         * { box-sizing: border-box; }
@@ -44,9 +45,9 @@
         }
 
         .header {
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -76,6 +77,7 @@
             padding: 4px;
             border-radius: 8px;
             gap: 2px;
+            flex-wrap: wrap;
         }
 
         .level-selector input[type="radio"] { display: none; }
@@ -84,7 +86,7 @@
             padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-light);
             transition: all 0.2s ease;
@@ -98,7 +100,6 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* 50/25/25 Layout */
         .container {
             display: flex;
             gap: 24px;
@@ -109,8 +110,26 @@
             min-height: 0;
         }
 
-        .editor-column { flex: 2; min-width: 0; display: flex; flex-direction: column; min-height: 0; }
-        .sidebar-column { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; min-height: 0; }
+        .editor-column {
+            flex: 2; 
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .sidebar-column {
+            flex: 1; 
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 0;
+        }
 
         .column-header {
             padding: 20px 20px 12px 20px;
@@ -168,6 +187,7 @@
             background-color: #cbd5e1;
             transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
             border-radius: 20px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
         }
 
         .slider:before {
@@ -178,9 +198,11 @@
             background-color: white;
             transition: .3s cubic-bezier(0.4, 0.0, 0.2, 1);
             border-radius: 50%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
         input:checked + .slider { background-color: var(--primary); }
+        input:focus-visible + .slider { outline: 2px solid var(--primary); outline-offset: 2px; }
         input:checked + .slider:before { transform: translateX(14px); }
 
         .editor-wrapper {
@@ -189,6 +211,7 @@
             display: flex;
             flex-direction: column;
             background: var(--surface);
+            border: 1px solid var(--border);
             border-radius: 12px;
             box-shadow: var(--shadow);
             overflow: hidden;
@@ -198,34 +221,38 @@
         #editor {
             flex-grow: 1;
             min-height: 320px;
-            padding: 32px;
+            padding: 24px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            font-size: 1.1rem;
-            line-height: 1.7;
+            font-size: 1.05rem;
+            line-height: 1.8;
             outline: none;
             white-space: pre-wrap;
             word-wrap: break-word;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
+            border-top-left-radius: 11px; 
+            border-top-right-radius: 11px;
         }
 
-        #editor:focus { box-shadow: inset 0 0 0 3px rgba(2, 132, 199, 0.1); }
+        #editor:focus { box-shadow: inset 0 0 0 2px var(--primary); }
 
         #editor:empty:before {
             content: attr(data-placeholder);
             color: var(--text-light);
             pointer-events: none;
+            white-space: pre-wrap;
         }
 
-        /* Tags - Fixed shading */
+        /* Final Inserted Tags - No Shading */
         strong {
             color: var(--primary);
-            background-color: transparent; /* Clean look with no background */
+            background-color: transparent; 
+            padding: 0;
+            border-radius: 0;
             font-weight: 800;
             white-space: nowrap;
             cursor: pointer;
         }
+
         strong.selected {
             background-color: #fecaca;
             color: #b91c1c;
@@ -233,6 +260,7 @@
             padding: 0 4px;
         }
 
+        /* Pending Suggestion Tag */
         .pending-tag {
             display: inline-flex;
             align-items: center;
@@ -257,23 +285,31 @@
         .pending-reject:hover { background: #fee2e2; }
 
         .editor-footer {
-            padding: 16px 20px;
-            background: #f8fafc;
+            padding: 12px 16px;
+            background: #f1f5f9;
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             gap: 12px;
+            flex-wrap: wrap;
             flex-shrink: 0;
         }
 
-        .sidebar-subtext { margin: 4px 0 0 0; font-size: 0.75rem; color: var(--text-light); min-height: 1.1em; }
+        .footer-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .sidebar-subtext {
+            margin: -4px 0 0 0;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            min-height: 1.2em;
+        }
 
         .codes-container {
             flex-grow: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 12px 16px;
-            background: #ffffff; 
+            padding: 16px;
+            min-height: 0;
         }
 
         .code-btn {
@@ -282,18 +318,70 @@
             align-items: center;
             width: 100%;
             text-align: left;
-            padding: 10px 14px;
-            margin-bottom: 8px;
-            background: #fdfdfd;
-            border: 1.5px solid var(--border); 
-            border-radius: 10px;
+            padding: 9px 12px;
+            margin-bottom: 7px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             color: var(--text);
-            font-size: 0.85rem;
-            transition: all 0.2s;
+            font-size: 0.88rem;
+            line-height: 1.2;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            -webkit-tap-highlight-color: transparent;
         }
-        .code-btn:hover { border-color: var(--primary); background: #f0f9ff; transform: translateY(-1px); }
+
+        .code-btn:hover {
+            border-color: var(--primary);
+            background: #f0f9ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        /* Clear Stars for Inactive */
+        .star-icon {
+            color: #94a3b8; 
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: color 0.2s, transform 0.2s;
+            padding-left: 8px;
+        }
+        .star-icon:hover { color: #64748b; transform: scale(1.15); }
+        .star-icon.active { color: #f59e0b; } 
+
+        .delete-icon {
+            color: #ef4444;
+            font-size: 1.2rem;
+            line-height: 1;
+            padding-left: 6px;
+            padding-right: 4px;
+            transition: transform 0.2s, color 0.2s;
+            opacity: 0.6;
+        }
+        .delete-icon:hover { opacity: 1; transform: scale(1.15); color: #dc2626; }
+
+        .add-code-section {
+            padding: 16px 20px 20px 20px;
+            border-top: 1px solid var(--border);
+            background: #f8fafc;
+        }
+
+        .input-stack { display: flex; flex-direction: column; gap: 10px; }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+        input[type="text"]:focus { border-color: var(--primary); }
 
         .auto-mark-btn {
             background: var(--magic);
@@ -313,6 +401,7 @@
         }
         .auto-mark-btn.loading { animation: spin 1s linear infinite; opacity: 0.7; pointer-events: none; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        .auto-mark-btn:hover { background: var(--magic-hover); transform: scale(1.1); }
 
         .accept-all-btn {
             background: #f5f3ff;
@@ -336,8 +425,9 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 700;
-            font-size: 0.9rem;
+            font-weight: 600;
+            font-size: 0.93rem;
+            transition: background 0.2s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -345,38 +435,78 @@
             min-height: 42px;
         }
 
-        .page-footer { text-align: center; font-size: 0.8rem; color: var(--text-light); padding: 16px 0; font-weight: 600; flex-shrink: 0; }
+        .action-btn:hover { background: var(--primary-hover); }
+        .action-btn.secondary { background: #e2e8f0; color: #475569; }
+        .action-btn.success { background: var(--success); }
 
-        /* Stars - Fixed to use clear outlines vs solid */
-        .star-icon {
-            color: #cbd5e1;
-            font-size: 1.2rem;
-            line-height: 1;
-            transition: color 0.2s, transform 0.2s;
-            padding-left: 8px;
+        .floating-remove-btn {
+            position: absolute;
+            display: none;
+            background: var(--danger);
+            color: white;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            transform: translate(-50%, -100%);
+            margin-top: -8px;
+            white-space: nowrap;
+            align-items: center;
+            gap: 6px;
         }
-        .star-icon:hover { color: #94a3b8; transform: scale(1.15); }
-        .star-icon.active { color: #f59e0b; } /* Gold when active */
 
         #favorites-popup {
             position: absolute;
             display: none;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            padding: 8px;
-            z-index: 1000;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            padding: 6px;
+            z-index: 9999; /* Boosted z-index to stay above everything */
             flex-direction: column;
             gap: 4px;
-            min-width: 220px;
-            border: 1px solid var(--border);
+            min-width: 180px;
         }
         #favorites-popup.visible { display: flex; }
 
-        .fav-popup-btn { background: transparent; border: none; text-align: left; padding: 10px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; color: var(--text); font-size: 0.85rem; transition: background 0.15s; }
+        .fav-popup-btn {
+            background: transparent;
+            border: none;
+            text-align: left;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.85rem;
+            transition: background 0.15s;
+        }
         .fav-popup-btn:hover { background: #f0f9ff; color: var(--primary); }
 
-        #tooltip {
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e293b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: 1000;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        #copy-staging { position: absolute; left: -9999px; top: -9999px; }
+
+        .tooltip {
             position: fixed;
             z-index: 2000;
             display: none;
@@ -392,36 +522,47 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .tooltip-header { color: var(--primary); font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
 
-        /* Modal Overlays - Fixed Stray Render */
+        /* Fixed stray Modal issue */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(4px);
-            display: none; /* Changed from flex/opacity:0 to ensure it's removed from layout */
+            display: none; /* Strictly none when not visible */
             align-items: center;
             justify-content: center;
             z-index: 2000;
         }
         .modal-overlay.visible { display: flex; }
-        .modal-content { background: var(--surface); border-radius: 12px; width: 90%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .modal-header { padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h2 { margin: 0; font-size: 1.2rem; font-weight: 800; }
-        .modal-close { background: none; border: none; font-size: 2rem; cursor: pointer; line-height: 1; padding: 0; color: var(--text-light); }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { margin: 0; font-size: 1.25rem; font-weight: 800; }
+        .modal-close { background: none; border: none; font-size: 1.75rem; cursor: pointer; color: var(--text-light); line-height: 1; padding: 0; }
         .modal-body { padding: 24px; overflow-y: auto; flex-grow: 1; }
         .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); background: #f8fafc; display: flex; justify-content: flex-end; gap: 12px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
 
+        .page-footer { text-align: center; font-size: 0.8rem; color: var(--text-light); padding-top: 20px; margin-top: auto; font-weight: 500; flex-shrink: 0; }
+
         @media (max-width: 1200px) {
-            body { padding: 12px; }
-            .container { gap: 12px; }
-            #editor { font-size: 1rem; padding: 20px; }
+            body { padding: 14px; overflow: auto; height: auto; min-height: 100dvh; }
+            .container { flex-direction: row; flex-wrap: wrap; min-height: auto; }
+            .editor-column { width: 100%; flex: 0 0 100%; margin-bottom: 10px; }
+            .sidebar-column { flex: 1; min-width: 300px; min-height: 400px; }
         }
         @media (max-width: 768px) {
-            body { overflow: auto; height: auto; }
-            .container { flex-direction: column; }
+            .sidebar-column { flex: 0 0 100%; }
         }
     </style>
 </head>
@@ -429,12 +570,14 @@
     <div class="header">
         <h1>RAPID MARK</h1>
         <div class="header-actions">
-            <button class="action-btn secondary" id="evidence-mode-btn">Evidence Mode: OFF</button>
+            <button class="action-btn secondary" id="evidence-mode-btn" title="Toggle evidence / source feedback codes">Evidence Mode: OFF</button>
             <div class="level-selector">
                 <input type="radio" id="lvl-primary" name="student-level" value="upper_primary">
                 <label for="lvl-primary">Upper Primary</label>
+
                 <input type="radio" id="lvl-lower" name="student-level" value="lower_sec" checked>
                 <label for="lvl-lower">Lower Secondary</label>
+
                 <input type="radio" id="lvl-upper" name="student-level" value="upper_sec">
                 <label for="lvl-upper">Upper Secondary</label>
             </div>
@@ -443,7 +586,6 @@
     </div>
 
     <div class="container">
-        <!-- Editor Column -->
         <div class="editor-column">
             <div class="column-header">
                 <div class="title-row">
@@ -464,20 +606,23 @@
                 <p class="sidebar-subtext" style="visibility: hidden;">Placeholder</p>
             </div>
             <div class="editor-wrapper">
-                <div id="editor" contenteditable="true" data-placeholder="Paste student text here.&#10;Tap ✨ to suggest feedback. Grey tags are suggestions; tick to accept or tap middle to swap."></div>
-                <button id="remove-code-btn" style="position: absolute; display: none; background: var(--danger); color: white; padding: 6px 12px; font-size: 0.85rem; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; z-index: 50; transform: translate(-50%, -100%); margin-top: -8px;">Remove</button>
+                <div id="editor" contenteditable="true" data-placeholder="1. Paste student text here.&#10;2. Tap ✨ to auto-scan for feedback.&#10;3. Or manually select text and click a code."></div>
+
+                <button class="floating-remove-btn" id="remove-code-btn">Remove</button>
                 <div id="favorites-popup"></div>
+
                 <div class="editor-footer">
-                    <div style="display:flex; gap:10px;">
+                    <div class="footer-group">
                         <button class="action-btn secondary" id="clear-btn">Clear Text</button>
                         <button class="action-btn secondary" id="undo-btn" style="display:none;">Undo</button>
                     </div>
-                    <button class="action-btn" id="copy-btn">Copy Feedback</button>
+                    <div class="footer-group">
+                        <button class="action-btn" id="copy-btn">Copy Feedback</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sidebar: Structure -->
         <div class="sidebar-column">
             <div class="column-header">
                 <div class="title-row">
@@ -494,12 +639,13 @@
             </div>
             <div id="codes-container-1" class="codes-container"></div>
             <div class="add-code-section">
-                <input type="text" id="new-code-input-1" placeholder="Custom code..." style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); margin-bottom:8px; font-size:0.8rem;">
-                <button class="action-btn" id="add-code-btn-1" style="width:100%; min-height: 34px; font-size: 0.8rem;">+ Add Code</button>
+                <div class="input-stack">
+                    <input type="text" id="new-code-input-1" placeholder="Custom code...">
+                    <button class="action-btn full-width" id="add-code-btn-1">+ Add Structure Code</button>
+                </div>
             </div>
         </div>
 
-        <!-- Sidebar: Expression -->
         <div class="sidebar-column">
             <div class="column-header">
                 <div class="title-row">
@@ -509,15 +655,19 @@
             </div>
             <div id="codes-container-2" class="codes-container"></div>
             <div class="add-code-section">
-                <input type="text" id="new-code-input-2" placeholder="Custom code..." style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); margin-bottom:8px; font-size:0.8rem;">
-                <button class="action-btn" id="add-code-btn-2" style="width:100%; min-height: 34px; font-size: 0.8rem;">+ Add Code</button>
+                <div class="input-stack">
+                    <input type="text" id="new-code-input-2" placeholder="Custom code...">
+                    <button class="action-btn full-width" id="add-code-btn-2">+ Add Expression Code</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="page-footer">&copy; 2026 Nic Comino. All rights reserved.</div>
+    <div class="page-footer">
+        &copy; 2026 Nic Comino. All rights reserved.
+    </div>
 
-    <!-- Modals -->
+    <!-- Class Summary Modal -->
     <div id="summary-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -532,41 +682,65 @@
         </div>
     </div>
 
-    <div id="toast" style="position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 600; opacity: 0; transition: all 0.3s; z-index: 1000; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">Copied to clipboard.</div>
-    <div id="copy-staging" style="position: absolute; left: -9999px;"></div>
-    <div id="tooltip"></div>
+    <div id="toast">Copied to clipboard.</div>
+    <div id="copy-staging"></div>
+    <div id="tooltip" class="tooltip"></div>
 
     <script>
-        const apiKey = "";
+        const apiKey = ""; // Handled automatically by the Canvas platform
+        let evidenceMode = false;
+
+        // V4 Base Code Data Fully Restored
         const baseCodeData = {
-            'FIX THIS FRAGMENT': { category: 'structure', explanation: 'Missing main subject or verb.' },
-            'SPLIT THIS RUN-ON': { category: 'structure', explanation: 'Joined without proper punctuation.' },
-            'MIXING TENSE': { category: 'structure', explanation: 'Verbs switch time periods.' },
-            'REPEATED IDEA': { category: 'structure', explanation: 'Point already made.' },
-            'EXPAND IDEA': { category: 'structure', explanation: 'Give more detail or context.' },
-            'VAGUE STATEMENT': { category: 'expression', explanation: 'Too general. Add specifics.' },
-            'WEAK VOCABULARY': { category: 'expression', explanation: 'Replace with more precise words.' },
-            'QUOTE NOT INTRODUCED': { category: 'evidence', explanation: 'Provide context for quote.' },
-            'AWKWARD PHRASING': { category: 'expression', explanation: 'Sounds unnatural or clumsy.' }
+            'FIX THIS FRAGMENT': { category: 'structure', explanation: 'This is an incomplete sentence missing a main subject or verb.', examples: { upper_primary: '"Because I was tired." ➔ "I slept because I was tired."', lower_sec: '"Running through the dark forest." ➔ "She was running through the dark forest."', upper_sec: '"Although the results were largely inconclusive." ➔ "Although the results were largely inconclusive, they suggest a trend."' } },
+            'SPLIT THIS RUN-ON': { category: 'structure', explanation: 'Two or more complete sentences are joined without proper punctuation.', examples: { upper_primary: '"I like dogs they are fun." ➔ "I like dogs. They are fun."', lower_sec: '"We went to the beach it was raining we went home." ➔ "We went to the beach, but it was raining. We went home."', upper_sec: '"The experiment failed however we gathered useful data." ➔ "The experiment failed; however, we gathered useful data."' } },
+            'MIXING TENSE': { category: 'structure', explanation: 'Keep your verbs in the same time period throughout the sentence or paragraph.', examples: { upper_primary: '"I ran and jump." ➔ "I ran and jumped."', lower_sec: '"He says... and then he walked." ➔ "He said... and then he walked."', upper_sec: '"The author argues... and noted." ➔ "The author argues... and notes."' } },
+            'REPEATED IDEA': { category: 'structure', explanation: 'You have already made this point. Move to a fresh idea or combine the sentences.', examples: { upper_primary: '"I like pizza. Pizza is my favourite. I enjoy eating pizza." ➔ "Pizza is my favourite food."', lower_sec: '"The hero was courageous. He showed a lot of bravery." ➔ "The hero demonstrated immense courage."', upper_sec: '"The data is redundant. It repeats the same information." ➔ "The data is redundant."' } },
+            'EXPAND IDEA': { category: 'structure', explanation: 'Give more detail, context, or evidence so the idea is fully developed.', examples: { upper_primary: '"My weekend was fun." ➔ "My weekend was fun because I went to the zoo and saw lions."', lower_sec: '"The character felt sad." ➔ "The character felt sad, shown through his silence and withdrawal."', upper_sec: '"The treaty ended the war." ➔ "The treaty ended the war but also created harsh conditions that led to future conflict."' } },
+            'ADD MORE DEPTH': { category: 'structure', explanation: 'Go beyond summary. Analyse how or why it matters.', examples: { upper_primary: '"The plant grew." ➔ "The plant grew because it had water and sunlight."', lower_sec: '"The author uses a metaphor." ➔ "The author uses a metaphor to highlight the character’s isolation."', upper_sec: '"The protagonist is conflicted." ➔ "The protagonist’s conflict mirrors the wider social tension in the text."' } },
+            'EXPLAIN WHY': { category: 'structure', explanation: 'Support this point with a reason, evidence, or logical link.', examples: { upper_primary: '"Math is hard." ➔ "Math is hard because there are many rules to remember."', lower_sec: '"The plan failed." ➔ "The plan failed because the group did not communicate clearly."', upper_sec: '"This policy is ineffective." ➔ "This policy is ineffective because it does not address the root cause."' } },
+            'CHECK WORD COUNT': { category: 'structure', explanation: 'This section may be too brief or too long. Adjust it to suit the task.', examples: { upper_primary: 'Aim for at least 3 complete sentences.', lower_sec: 'Aim for 5–7 developed sentences in this paragraph.', upper_sec: 'Meet the length requirement without padding the response.' } },
+            'PROOFREADING NEEDED': { category: 'expression', explanation: 'Check spelling, punctuation, capitals, and small errors.', examples: { upper_primary: '"i went to the park" ➔ "I went to the park."', lower_sec: '"Their going to the store." ➔ "They’re going to the store."', upper_sec: '"The data indicates it’s effect." ➔ "The data indicates its effect."' } },
+            'AWKWARD PHRASING': { category: 'expression', explanation: 'This wording sounds unnatural or clumsy. Read it aloud and smooth it out.', examples: { upper_primary: '"The ball was throwed by him." ➔ "He threw the ball."', lower_sec: '"For the making of the project we used glue." ➔ "We used glue to make the project."', upper_sec: '"The reason for the delay was due to the fact that..." ➔ "The delay occurred because..."' } },
+            'SENTENCE UNCLEAR': { category: 'expression', explanation: 'The meaning is difficult to follow. Rewrite it more clearly.', examples: { upper_primary: '"The thing did the stuff." ➔ "The machine sorted the blocks."', lower_sec: '"He told him that he should go." ➔ "John told Mark to leave."', upper_sec: '"The overarching theme encapsulates the dichotomy." ➔ "The main theme highlights the internal conflict."' } },
+            'VAGUE STATEMENT': { category: 'expression', explanation: 'This point is too general. Add something specific.', examples: { upper_primary: '"The book was good." ➔ "The book was exciting because of the plot twists."', lower_sec: '"People think pollution is bad." ➔ "Many people argue that plastic pollution harms sea life."', upper_sec: '"Society has changed a lot." ➔ "Technology has significantly changed how people communicate."' } },
+            'TOO MANY STOP WORDS': { category: 'expression', explanation: 'Cut filler words and weak wording so the sentence sounds stronger.', examples: { upper_primary: '"It was really very big." ➔ "It was enormous."', lower_sec: '"I just think that it is basically true." ➔ "I believe it is true."', upper_sec: '"In my personal opinion, it is completely evident that..." ➔ "It is evident that..."' } },
+            'REPETITION': { category: 'expression', explanation: 'A key word or phrase is repeated too closely. Vary it or combine the ideas.', examples: { upper_primary: '"The big dog chased the big cat." ➔ "The large dog chased the big cat."', lower_sec: '"The author shows that the character is brave. This shows bravery." ➔ "The author presents the character as courageous."', upper_sec: '"The study focuses on the effects. The effects were significant." ➔ "The study focuses on the significant impacts."' } },
+            'ADD EVIDENCE': { category: 'evidence', explanation: 'Support your claim with a quotation, example, or factual detail from the text or source.', examples: { upper_primary: 'Add a sentence showing where this idea appears in the text.', lower_sec: 'Include a quote or specific detail from the text.', upper_sec: 'Integrate a relevant quotation or reference from the source.' } },
+            'EXPLAIN THE EVIDENCE': { category: 'evidence', explanation: 'Do not leave the quote alone. Explain how it proves your point.', examples: { upper_primary: 'Explain how the example proves your idea.', lower_sec: 'Show how the quote supports your argument.', upper_sec: 'Analyse the evidence and connect it to your claim.' } },
+            'LINK BACK TO QUESTION': { category: 'evidence', explanation: 'Your paragraph should clearly connect back to the essay question or argument.', examples: { upper_primary: 'Remind the reader what the question is asking.', lower_sec: 'Connect this idea clearly to the task question.', upper_sec: 'Explicitly link this analysis back to your thesis.' } },
+            'QUOTE NOT INTRODUCED': { category: 'evidence', explanation: 'Introduce the quote before using it. Tell the reader who said it or where it comes from.', examples: { upper_primary: 'Explain who said the quote.', lower_sec: 'Introduce the quote with context.', upper_sec: 'Integrate the quote grammatically into your sentence.' } }
         };
 
-        const STORAGE_PREFIX = 'rapidMark_v3_';
-        let savedCustomCodes = {}; let classSummaryCounts = {}; let favoriteCodes = ["AWKWARD PHRASING", "FIX THIS FRAGMENT", "EXPAND IDEA"]; let tooltipsEnabled = true; let favoritesEnabled = true; let savedDraft = null;
+        // Using V4 exact storage keys
+        const CUSTOM_STORAGE_KEY = 'annotatorCustomCodesV2';
+        const CLASS_SUMMARY_KEY = 'annotatorClassSummaryV2';
+        const EDITOR_DRAFT_KEY = 'annotatorEditorDraftV2';
+        const FAVORITES_KEY = 'annotatorFavoritesV2';
+        const TOOLTIP_PREF_KEY = 'annotatorTooltipsEnabledV2';
+        const FAV_TOGGLE_PREF_KEY = 'annotatorFavoritesToggleV2';
+
+        let savedCustomCodes = {};
+        let classSummaryCounts = {};
+        let favoriteCodes = ["AWKWARD PHRASING", "FIX THIS FRAGMENT", "EXPAND IDEA"];
+        let tooltipsEnabled = true;
+        let favoritesEnabled = true;
+        let savedDraft = null;
 
         // Safe Storage Logic
-        try { savedCustomCodes = JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'custom') || '{}'); } catch (e) {}
-        try { classSummaryCounts = JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'summary') || '{}'); } catch (e) {}
-        try { const favs = localStorage.getItem(STORAGE_PREFIX + 'favs'); if (favs) favoriteCodes = JSON.parse(favs); } catch (e) {}
-        try { const tpref = localStorage.getItem(STORAGE_PREFIX + 'tooltips'); if (tpref !== null) tooltipsEnabled = JSON.parse(tpref); } catch (e) {}
-        try { const fpref = localStorage.getItem(STORAGE_PREFIX + 'favToggle'); if (fpref !== null) favoritesEnabled = JSON.parse(fpref); } catch (e) {}
-        try { savedDraft = localStorage.getItem(STORAGE_PREFIX + 'draft'); } catch (e) {}
-
-        // Initialize toggle switches
-        document.getElementById('favorites-toggle').checked = favoritesEnabled;
-        document.getElementById('tooltip-toggle').checked = tooltipsEnabled;
+        try { savedCustomCodes = JSON.parse(localStorage.getItem(CUSTOM_STORAGE_KEY) || '{}'); } catch (e) {}
+        try { classSummaryCounts = JSON.parse(localStorage.getItem(CLASS_SUMMARY_KEY) || '{}'); } catch (e) {}
+        try { const favs = localStorage.getItem(FAVORITES_KEY); if (favs) favoriteCodes = JSON.parse(favs); } catch (e) {}
+        try { const tpref = localStorage.getItem(TOOLTIP_PREF_KEY); if (tpref !== null) tooltipsEnabled = JSON.parse(tpref); } catch (e) {}
+        try { const fpref = localStorage.getItem(FAV_TOGGLE_PREF_KEY); if (fpref !== null) favoritesEnabled = JSON.parse(fpref); } catch (e) {}
+        try { savedDraft = localStorage.getItem(EDITOR_DRAFT_KEY); } catch (e) {}
 
         const codeData = { ...baseCodeData, ...savedCustomCodes };
+        let codeKeys = Object.keys(codeData);
+
+        // Core DOM Elements
         const editor = document.getElementById('editor');
+        const editorWrapper = document.querySelector('.editor-wrapper');
         const codesContainer1 = document.getElementById('codes-container-1');
         const codesContainer2 = document.getElementById('codes-container-2');
         const toast = document.getElementById('toast');
@@ -577,25 +751,332 @@
         const tooltip = document.getElementById('tooltip');
         const magicBtn = document.getElementById('run-auto-mark-btn');
 
-        let activeTag = null; let swappingTag = null; let lastClearedContent = null;
-        let hoverTimer = null; let lastHoverTarget = null;
+        // Missing UI Elements Restored for Event Listeners
+        const evidenceModeBtn = document.getElementById('evidence-mode-btn');
+        const classSummaryBtn = document.getElementById('class-summary-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const copyResetBtn = document.getElementById('copy-reset-btn');
+        const copyOnlyBtn = document.getElementById('copy-only-btn');
+        const removeCodeBtn = document.getElementById('remove-code-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const undoBtn = document.getElementById('undo-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const addCodeBtn1 = document.getElementById('add-code-btn-1');
+        const addCodeBtn2 = document.getElementById('add-code-btn-2');
+        const newCodeInput1 = document.getElementById('new-code-input-1');
+        const newCodeInput2 = document.getElementById('new-code-input-2');
+        const copyStaging = document.getElementById('copy-staging');
+        const favoritesToggle = document.getElementById('favorites-toggle');
+        const tooltipToggle = document.getElementById('tooltip-toggle');
 
-        const showToast = (m) => { toast.textContent = m; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2600); };
-        const saveDraft = () => { try { localStorage.setItem(STORAGE_PREFIX + 'draft', editor.innerHTML); } catch (e) {} };
-        const saveClassSummary = () => { try { localStorage.setItem(STORAGE_PREFIX + 'summary', JSON.stringify(classSummaryCounts)); } catch (e) {} };
+        let activeTag = null;
+        let swappingTag = null;
+        let lastClearedContent = null;
+        let hideToastTimer = null;
+        let hoverTimer = null;
+        let lastHoverTarget = null;
+
+        // Initialize Toggles
+        favoritesToggle.checked = favoritesEnabled;
+        if (tooltipToggle) tooltipToggle.checked = tooltipsEnabled;
+
+        const showToast = (message) => {
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(hideToastTimer);
+            hideToastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+        };
+
+        const saveDraft = () => { try { localStorage.setItem(EDITOR_DRAFT_KEY, editor.innerHTML); } catch (e) {} };
+        const saveClassSummary = () => { try { localStorage.setItem(CLASS_SUMMARY_KEY, JSON.stringify(classSummaryCounts)); } catch (e) {} };
         const saveCustomCodes = () => {
-            const customOnly = {}; Object.keys(codeData).forEach(k => { if (!baseCodeData[k]) customOnly[k] = codeData[k]; });
-            try { localStorage.setItem(STORAGE_PREFIX + 'custom', JSON.stringify(customOnly)); } catch (e) {}
+            const customOnly = {};
+            Object.keys(codeData).forEach(key => { if (!baseCodeData[key]) customOnly[key] = codeData[key]; });
+            try { localStorage.setItem(CUSTOM_STORAGE_KEY, JSON.stringify(customOnly)); } catch (e) {}
         };
 
-        const copyHTMLToClipboard = async (html, text) => {
+        const copyHTMLToClipboard = async (html, textFallback) => {
             if (navigator.clipboard && window.ClipboardItem) {
-                try { const item = new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([text], { type: 'text/plain' }) }); await navigator.clipboard.write([item]); return true; } catch (e) {}
+                try {
+                    const item = new ClipboardItem({
+                        'text/html': new Blob([html], { type: 'text/html' }),
+                        'text/plain': new Blob([textFallback], { type: 'text/plain' })
+                    });
+                    await navigator.clipboard.write([item]);
+                    return true;
+                } catch (err) {}
             }
-            return false;
+            copyStaging.innerHTML = html;
+            const range = document.createRange();
+            range.selectNodeContents(copyStaging);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            let ok = false;
+            try { ok = document.execCommand('copy'); } catch (err) {}
+            selection.removeAllRanges();
+            copyStaging.innerHTML = '';
+            return ok;
         };
 
-        // --- AI ENGINE WITH EXPONENTIAL BACKOFF ---
+        const getSelectedLevel = () => document.querySelector('input[name="student-level"]:checked').value;
+
+        const countCodesInHTML = (html) => {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            const counts = {};
+            temp.querySelectorAll('strong').forEach(tag => {
+                const code = tag.textContent.replace(/^\[/, '').replace(/\]$/, '');
+                counts[code] = (counts[code] || 0) + 1;
+            });
+            return counts;
+        };
+
+        const orderedCounts = (counts) => Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+
+        const getStudentQuickSummary = (counts) => {
+            const ordered = orderedCounts(counts);
+            if (!ordered.length) return 'Quick Summary: No feedback codes were added yet.';
+            const topThree = ordered.slice(0, 3).map(([code, count]) => `${code} (${count})`);
+            return `Quick Summary: Focus first on ${topThree.join(', ')}.`;
+        };
+
+        const getClassSummaryHTML = () => {
+            const ordered = orderedCounts(classSummaryCounts);
+            if (!ordered.length) return '<p style="margin:0;">Class Summary: No feedback has been recorded yet.</p>';
+
+            const rows = ordered.map(([code, count], index) => {
+                const category = codeData[code]?.category === 'structure' ? 'Structure' : 'Expression';
+                return `<tr>
+                    <td style="padding:8px 10px; border:1px solid #cbd5e1;">${index + 1}</td>
+                    <td style="padding:8px 10px; border:1px solid #cbd5e1;"><strong>[${code}]</strong></td>
+                    <td style="padding:8px 10px; border:1px solid #cbd5e1;">${category}</td>
+                    <td style="padding:8px 10px; border:1px solid #cbd5e1;">${count}</td>
+                </tr>`;
+            }).join('');
+
+            return `
+                <h3 style="color:#0f172a; margin:0 0 10px 0;">Class Summary</h3>
+                <p style="margin:0 0 12px 0; color:#475569;">Most common issues across the class, from most frequent to least.</p>
+                <table style="border-collapse:collapse; width:100%; font-size:0.95rem;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left; padding:8px 10px; border:1px solid #cbd5e1; background:#f8fafc;">#</th>
+                            <th style="text-align:left; padding:8px 10px; border:1px solid #cbd5e1; background:#f8fafc;">Code</th>
+                            <th style="text-align:left; padding:8px 10px; border:1px solid #cbd5e1; background:#f8fafc;">Category</th>
+                            <th style="text-align:left; padding:8px 10px; border:1px solid #cbd5e1; background:#f8fafc;">Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+        };
+
+        const hideOverlays = () => {
+            if (activeTag) { activeTag.classList.remove('selected'); activeTag = null; }
+            removeCodeBtn.classList.remove('visible');
+            favPopup.classList.remove('visible');
+            hideTooltip();
+        };
+
+        const hideTooltip = () => {
+            clearTimeout(hoverTimer);
+            hoverTimer = null;
+            lastHoverTarget = null;
+            tooltip.style.display = 'none';
+        };
+
+        const showTooltip = (btn) => {
+            if (!tooltipsEnabled) return;
+            const code = btn.dataset.code;
+            const data = codeData[code];
+            if (!data) return;
+            const level = getSelectedLevel();
+            const example = data.examples?.[level] || '';
+            tooltip.innerHTML = `
+                <span class="tooltip-header">${code}</span>
+                <div>${data.explanation}</div>
+                ${example ? `<div style="margin-top:6px; color:#cbd5e1; font-style:italic;">Example: ${example}</div>` : ''}
+            `;
+            const rect = btn.getBoundingClientRect();
+            const maxLeft = window.innerWidth - 340;
+            const top = Math.min(window.innerHeight - 20, rect.top + rect.height / 2 - 20);
+            const left = Math.max(12, Math.min(rect.right + 12, maxLeft));
+            tooltip.style.top = `${top}px`;
+            tooltip.style.left = `${left}px`;
+            tooltip.style.display = 'block';
+        };
+
+        const attachTooltipHandlers = (btn) => {
+            const startHover = () => {
+                hideTooltip();
+                lastHoverTarget = btn;
+                hoverTimer = setTimeout(() => { if (lastHoverTarget === btn) showTooltip(btn); }, 100);
+            };
+            btn.addEventListener('mouseenter', startHover);
+            btn.addEventListener('focus', startHover);
+            btn.addEventListener('mouseleave', hideTooltip);
+            btn.addEventListener('blur', hideTooltip);
+        };
+
+        function toggleFavorite(code, starElement) {
+            const index = favoriteCodes.indexOf(code);
+            if (index > -1) {
+                favoriteCodes.splice(index, 1);
+                starElement.classList.remove('active');
+                starElement.textContent = '☆';
+            } else {
+                favoriteCodes.push(code);
+                starElement.classList.add('active');
+                starElement.textContent = '★';
+            }
+            try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(favoriteCodes)); } catch (e) {}
+            if (favPopup.classList.contains('visible')) renderFavPopup(false);
+        }
+
+        function renderFavPopup(isSwapping = false) {
+            favPopup.innerHTML = '';
+            const list = isSwapping ? Object.keys(codeData) : favoriteCodes;
+            if (list.length === 0) {
+                favPopup.classList.remove('visible');
+                return;
+            }
+            list.forEach(code => {
+                const btn = document.createElement('button');
+                btn.className = 'fav-popup-btn';
+                btn.textContent = code;
+                btn.addEventListener('mousedown', (e) => { e.preventDefault(); });
+                btn.addEventListener('click', () => {
+                    if (isSwapping && swappingTag) {
+                        swappingTag.querySelector('.pending-label').textContent = code;
+                        swappingTag = null;
+                    } else {
+                        insertCode(code);
+                    }
+                    favPopup.classList.remove('visible');
+                });
+                favPopup.appendChild(btn);
+            });
+        }
+
+        function renderButtons() {
+            codesContainer1.innerHTML = '';
+            codesContainer2.innerHTML = '';
+
+            codeKeys = Object.keys(codeData).sort((a, b) => {
+                const catA = codeData[a].category || 'expression';
+                const catB = codeData[b].category || 'expression';
+                if (catA !== catB) return catA.localeCompare(catB);
+                return a.localeCompare(b);
+            });
+
+            codeKeys.forEach((code) => {
+                const btn = document.createElement('button');
+                btn.className = 'code-btn';
+                btn.dataset.code = code;
+                btn.type = 'button';
+
+                const isFav = favoriteCodes.includes(code);
+                const isCustom = !baseCodeData[code];
+                const starChar = isFav ? '★' : '☆';
+                
+                btn.innerHTML = `<span>${code}</span> <div style="display:flex; align-items:center;">
+                    ${isCustom ? `<span class="delete-icon" title="Delete custom code">×</span>` : ''}
+                    <span class="star-icon ${isFav ? 'active' : ''}">${starChar}</span>
+                </div>`;
+
+                const star = btn.querySelector('.star-icon');
+                star.addEventListener('mousedown', (e) => e.preventDefault());
+                star.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(code, star);
+                });
+
+                if (isCustom) {
+                    const delBtn = btn.querySelector('.delete-icon');
+                    delBtn.addEventListener('mousedown', (e) => e.preventDefault());
+                    delBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (confirm(`Delete custom code "${code}"?`)) {
+                            delete codeData[code];
+                            const favIndex = favoriteCodes.indexOf(code);
+                            if (favIndex > -1) {
+                                favoriteCodes.splice(favIndex, 1);
+                                try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(favoriteCodes)); } catch(e) {}
+                            }
+                            saveCustomCodes();
+                            renderButtons();
+                        }
+                    });
+                }
+
+                btn.addEventListener('mousedown', (e) => {
+                    if (e.target !== star && !e.target.classList.contains('delete-icon')) e.preventDefault();
+                });
+                
+                btn.addEventListener('click', (e) => {
+                    if (e.target !== star && !e.target.classList.contains('delete-icon')) insertCode(code);
+                });
+                
+                attachTooltipHandlers(btn);
+
+                const category = codeData[code].category || 'expression';
+                if(category === 'evidence' && !evidenceMode) return;
+                
+                if (category === 'structure') {
+                    codesContainer1.appendChild(btn);
+                } else {
+                    codesContainer2.appendChild(btn);
+                }
+            });
+
+            if (evidenceMode) {
+                const evidenceHint = document.createElement('div');
+                evidenceHint.style.cssText = 'margin: 2px 0 10px 0; padding: 8px 10px; border: 1px dashed #bae6fd; border-radius: 8px; background: #f0f9ff; color: #0369a1; font-size: 0.8rem; font-weight: 600;';
+                evidenceHint.textContent = 'Evidence codes are showing below.';
+                codesContainer2.prepend(evidenceHint);
+            }
+        }
+
+        function insertCode(code) {
+            if (activeTag) {
+                activeTag.textContent = `[${code}]`;
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.setStartAfter(activeTag);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                hideOverlays();
+                editor.focus();
+                saveDraft();
+                return;
+            }
+
+            editor.focus();
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+            const range = selection.getRangeAt(0);
+            if (!editor.contains(range.commonAncestorContainer)) return;
+
+            const strongNode = document.createElement('strong');
+            strongNode.textContent = `[${code}]`;
+            const spaceNode = document.createTextNode(' ');
+
+            range.deleteContents();
+            range.insertNode(spaceNode);
+            range.insertNode(strongNode);
+
+            const newRange = document.createRange();
+            newRange.setStartAfter(spaceNode);
+            newRange.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+            saveDraft();
+            hideOverlays();
+        }
+
+        // --- AI ENGINE WITH EXPONENTIAL BACKOFF & ROBUST PARSING ---
         async function fetchAIWithRetry(payload, retries = 3) {
             for (let i = 0; i < retries; i++) {
                 try {
@@ -620,7 +1101,8 @@
             magicBtn.classList.add('loading');
             magicBtn.textContent = '⏳';
 
-            const systemPrompt = `You are an expert Year 7 English teacher. Identify sentences with obvious mechanical issues. Available Codes: ${Object.keys(codeData).join(', ')}. Format: Return a JSON array of {"sentence": "exact text from draft", "code": "CODE_NAME"}.`;
+            // The prompt strictly demands JSON
+            const systemPrompt = `You are a helpful teaching assistant. Find sentences with obvious mechanical errors (fragments, run-ons, vague statements). Only use these codes: ${Object.keys(codeData).join(', ')}. Format as a plain JSON array of objects: [{"sentence": "exact text from draft", "code": "CODE_NAME"}]. If no issues, return [].`;
 
             try {
                 const result = await fetchAIWithRetry({
@@ -639,17 +1121,26 @@
                     }
                 });
 
-                const suggestions = JSON.parse(result.candidates[0].content.parts[0].text);
-                if (!suggestions.length) { showToast('No obvious issues found.'); return; }
+                let responseText = result.candidates[0].content.parts[0].text;
+                // Safely clean markdown blocks just in case
+                responseText = responseText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+                const suggestions = JSON.parse(responseText);
+
+                if (!suggestions.length) { 
+                    showToast('No obvious issues found.'); 
+                    return; 
+                }
 
                 let html = editor.innerHTML;
                 let added = 0;
 
                 suggestions.forEach(issue => {
-                    // Replaces literal spaces with forgiving whitespace/tag logic 
-                    const escaped = issue.sentence.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '(?:\\s|<[^>]+>|&nbsp;)+');
-                    const regex = new RegExp(`(${escaped})`, 'i');
-                    const marker = `<span class="pending-tag" contenteditable="false"><span class="pending-action pending-accept">✓</span><span class="pending-label">${issue.code}</span><span class="pending-action pending-reject">✗</span></span>`;
+                    // Make search regex bulletproof across spaces and html tags
+                    const escaped = issue.sentence.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regexStr = escaped.replace(/\s+/g, '(?:\\s|&nbsp;|<[^>]+>)+');
+                    const regex = new RegExp(`(${regexStr})`, 'i');
+                    
+                    const marker = `<span class="pending-tag" contenteditable="false"><span class="pending-action pending-accept" title="Accept Suggestion">✓</span><span class="pending-label">${issue.code}</span><span class="pending-action pending-reject" title="Reject Suggestion">✗</span></span>`;
                     
                     if (regex.test(html)) {
                         html = html.replace(regex, `$1 ${marker}`);
@@ -670,7 +1161,7 @@
             }
         }
 
-        // --- INTERACTIONS ---
+        // --- PENDING TAG INTERACTIONS ---
         editor.addEventListener('click', (e) => {
             const pendingTag = e.target.closest('.pending-tag');
             if (!pendingTag) return;
@@ -693,11 +1184,11 @@
             acceptAllBtn.style.display = count > 0 ? 'flex' : 'none';
         }
 
-        acceptAllBtn.onclick = () => {
+        acceptAllBtn.addEventListener('click', () => {
             const pending = editor.querySelectorAll('.pending-tag');
             pending.forEach(tag => acceptPendingTag(tag));
             showToast('Suggestions accepted.');
-        };
+        });
 
         function openSwapMenu(el, event) {
             swappingTag = el;
@@ -708,96 +1199,187 @@
             favPopup.classList.add('visible');
         }
 
-        function renderButtons() {
-            codesContainer1.innerHTML = ''; codesContainer2.innerHTML = '';
-            Object.keys(codeData).sort((a,b) => (codeData[a].category||'exp').localeCompare(codeData[b].category||'exp') || a.localeCompare(b)).forEach(c => {
-                const b = document.createElement('button'); b.className = 'code-btn'; b.dataset.code = c;
-                const isFav = favoriteCodes.includes(c); const isCustom = !baseCodeData[c];
-                b.innerHTML = `<span>${c}</span> <div style="display:flex; align-items:center;">${isCustom ? `<span class="delete-icon" onclick="event.stopPropagation(); deleteCode('${c}')">×</span>` : ''}<span class="star-icon ${isFav?'active':''}" onclick="event.stopPropagation(); toggleFavorite('${c}', this)">${isFav ? '★' : '☆'}</span></div>`;
-                b.onclick = () => insertCode(c);
-                const start = () => { lastHoverTarget = b; hoverTimer = setTimeout(() => { if (lastHoverTarget === b) showTooltip(b); }, 100); };
-                b.addEventListener('mouseenter', start); b.addEventListener('mouseleave', () => { clearTimeout(hoverTimer); tooltip.style.display = 'none'; });
-                (codeData[c].category === 'structure' ? codesContainer1 : codesContainer2).appendChild(b);
-            });
-        }
+        // --- EVENT LISTENERS ---
+        magicBtn.addEventListener('click', runAutoMark);
 
-        function showTooltip(btn) {
-            if (!tooltipsEnabled) return;
-            const code = btn.dataset.code; const data = codeData[code]; if (!data) return;
-            tooltip.innerHTML = `<span class="tooltip-header">${code}</span><div>${data.explanation}</div>`;
-            const rect = btn.getBoundingClientRect();
-            tooltip.style.top = `${rect.top + rect.height / 2 - 20}px`; tooltip.style.left = `${rect.right + 12}px`;
-            tooltip.style.display = 'block';
-        }
-
-        function renderFavPopup(isSwapping = false) {
-            favPopup.innerHTML = '';
-            const list = isSwapping ? Object.keys(codeData) : favoriteCodes;
-            if (list.length === 0) { favPopup.classList.remove('visible'); return; }
-            list.forEach(c => {
-                const b = document.createElement('button'); b.className = 'fav-popup-btn'; b.textContent = c;
-                b.onclick = () => { if (isSwapping && swappingTag) { swappingTag.querySelector('.pending-label').textContent = c; swappingTag = null; } else insertCode(c); favPopup.classList.remove('visible'); };
-                favPopup.appendChild(b);
-            });
-        }
-
-        function deleteCode(c) { if(confirm('Delete?')){delete codeData[c]; saveCustomCodes(); renderButtons();} }
-        function toggleFavorite(c, el) { 
-            const i = favoriteCodes.indexOf(c); 
-            if(i > -1) { favoriteCodes.splice(i,1); el.classList.remove('active'); el.textContent = '☆'; } 
-            else { favoriteCodes.push(c); el.classList.add('active'); el.textContent = '★'; } 
-            try { localStorage.setItem(STORAGE_PREFIX + 'favs', JSON.stringify(favoriteCodes)); } catch(e) {} 
-        }
-        
-        function insertCode(c) {
-            if (activeTag) { activeTag.textContent = `[${c}]`; activeTag.classList.remove('selected'); activeTag = null; saveDraft(); return; }
-            const sn = document.createElement('strong'); sn.textContent = `[${c}]`; const sp = document.createTextNode(' ');
-            const sel = window.getSelection(); if (!sel.rangeCount) return; const rng = sel.getRangeAt(0); rng.deleteContents(); rng.insertNode(sp); rng.insertNode(sn); saveDraft();
-        }
-
-        document.getElementById('run-auto-mark-btn').onclick = runAutoMark;
-        document.getElementById('clear-btn').onclick = () => { if(editor.innerText.trim()){lastClearedContent=editor.innerHTML; editor.innerHTML=''; document.getElementById('undo-btn').style.display='inline-flex'; saveDraft(); acceptAllBtn.style.display='none';} };
-        document.getElementById('undo-btn').onclick = () => { if(lastClearedContent){editor.innerHTML=lastClearedContent; lastClearedContent=null; document.getElementById('undo-btn').style.display='none'; saveDraft(); checkPendingCount();} };
-        
-        document.getElementById('copy-btn').onclick = async () => {
-            const sl = document.querySelector('input[name="student-level"]:checked').value;
-            const cc = {}; editor.querySelectorAll('strong').forEach(tg => { const cd = tg.textContent.replace(/[\[\]]/g, ''); cc[cd] = (cc[cd] || 0) + 1; });
-            const ord = Object.entries(cc).sort((a,b) => b[1]-a[1]);
-            let h = editor.innerHTML;
-            if (ord.length) {
-                h += `<hr style="margin:24px 0; border:none; border-top:1px solid #cbd5e1;"><h3>Feedback Legend</h3><ul style="line-height:1.6; padding-left:20px;">` + ord.map(([c]) => `<li><strong>[${c}]</strong>: ${codeData[c]?.explanation||'Feedback'}</li>`).join('') + `</ul>`;
-                ord.forEach(([c, n]) => { classSummaryCounts[c] = (classSummaryCounts[c] || 0) + n; }); saveClassSummary();
+        editor.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            if (document.queryCommandSupported && document.queryCommandSupported('insertText')) {
+                document.execCommand('insertText', false, text);
+            } else {
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(text));
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
             }
-            const staging = document.getElementById('copy-staging'); staging.innerHTML = h;
-            if (await copyHTMLToClipboard(staging.innerHTML, staging.innerText)) showToast('Feedback copied.');
-        };
+            saveDraft();
+        });
 
-        editor.onmouseup = (e) => {
+        editor.addEventListener('mouseup', (e) => {
             if (!e.target.closest('#favorites-popup') && !e.target.closest('.pending-tag')) favPopup.classList.remove('visible');
-            if (e.target.tagName === 'STRONG') { activeTag = e.target; activeTag.classList.add('selected'); const tr = activeTag.getBoundingClientRect(); const wr = editor.getBoundingClientRect(); const rb = document.getElementById('remove-code-btn'); rb.style.top = `${tr.top - wr.top}px`; rb.style.left = `${tr.left - wr.left + (tr.width/2)}px`; rb.style.display = 'block'; return; }
-            document.getElementById('remove-code-btn').style.display = 'none';
             
-            // Favourites Popup triggers as long as we have a selection (even collapsed)
-            if (favoritesEnabled && favoriteCodes.length && !e.target.closest('.pending-tag')) {
+            if (e.target.tagName === 'STRONG') { 
+                activeTag = e.target; 
+                activeTag.classList.add('selected'); 
+                const tr = activeTag.getBoundingClientRect(); 
+                const wr = editorWrapper.getBoundingClientRect(); 
+                removeCodeBtn.style.top = `${tr.top - wr.top}px`; 
+                removeCodeBtn.style.left = `${tr.left - wr.left + (tr.width / 2)}px`; 
+                removeCodeBtn.classList.add('visible'); 
+                return; 
+            }
+            
+            removeCodeBtn.classList.remove('visible');
+            
+            // Favourites Menu triggers on selection or click
+            if (favoritesEnabled && favoriteCodes.length > 0 && !e.target.closest('.pending-tag')) {
                 setTimeout(() => {
-                    const sel = window.getSelection(); if (!sel.rangeCount) return;
-                    const wr = editor.getBoundingClientRect(); favPopup.style.top = `${e.clientY - wr.top + 15}px`; favPopup.style.left = `${e.clientX - wr.left}px`;
-                    renderFavPopup(false); favPopup.classList.add('visible');
+                    const selection = window.getSelection();
+                    if (!selection.rangeCount) return;
+                    const wr = editorWrapper.getBoundingClientRect();
+                    let top = e.clientY - wr.top + 15; 
+                    let left = e.clientX - wr.left;
+                    if (left + 180 > wr.width) left = wr.width - 190;
+                    favPopup.style.top = `${top}px`;
+                    favPopup.style.left = `${left}px`;
+                    renderFavPopup(false);
+                    favPopup.classList.add('visible');
                 }, 10);
             }
-        };
+        });
 
-        document.getElementById('remove-code-btn').onclick = () => { if(activeTag){activeTag.remove(); activeTag=null; document.getElementById('remove-code-btn').style.display='none'; saveDraft();} };
-        document.getElementById('class-summary-btn').onclick = () => {
-            const ord = Object.entries(classSummaryCounts).sort((a,b) => b[1]-a[1]);
-            modalBodyContent.innerHTML = ord.length ? `<table style="width:100%; border-collapse:collapse;"><thead><tr><th style="text-align:left; padding:8px; border-bottom:1px solid #cbd5e1; background:#f8fafc;">Code</th><th style="text-align:left; padding:8px; border-bottom:1px solid #cbd5e1; background:#f8fafc;">Count</th></tr></thead><tbody>` + ord.map(([c,n]) => `<tr><td style="padding:12px 8px; border-bottom:1px solid #eee;"><strong>[${c}]</strong></td><td style="padding:12px 8px; border-bottom:1px solid #eee;">${n}</td></tr>`).join('') + `</tbody></table>` : '<p>No data recorded.</p>';
+        editor.addEventListener('input', () => {
+            hideOverlays();
+            if (lastClearedContent !== null) { lastClearedContent = null; undoBtn.style.display = 'none'; }
+            saveDraft();
+        });
+
+        editor.addEventListener('scroll', () => { hideOverlays(); });
+        window.addEventListener('resize', hideTooltip);
+        window.addEventListener('scroll', hideTooltip, true);
+
+        removeCodeBtn.addEventListener('click', () => {
+            if (activeTag) { activeTag.remove(); activeTag = null; removeCodeBtn.classList.remove('visible'); editor.focus(); saveDraft(); }
+        });
+
+        addCodeBtn1.addEventListener('click', () => addCustomCode(newCodeInput1, 'structure'));
+        addCodeBtn2.addEventListener('click', () => addCustomCode(newCodeInput2, 'expression'));
+        newCodeInput1.addEventListener('keypress', (e) => { if (e.key === 'Enter') addCodeBtn1.click(); });
+        newCodeInput2.addEventListener('keypress', (e) => { if (e.key === 'Enter') addCodeBtn2.click(); });
+
+        clearBtn.addEventListener('click', () => {
+            if (editor.innerHTML.trim() !== '') { lastClearedContent = editor.innerHTML; editor.innerHTML = ''; undoBtn.style.display = 'inline-flex'; hideOverlays(); saveDraft(); acceptAllBtn.style.display='none'; }
+        });
+
+        undoBtn.addEventListener('click', () => {
+            if (lastClearedContent !== null) { editor.innerHTML = lastClearedContent; lastClearedContent = null; undoBtn.style.display = 'none'; saveDraft(); checkPendingCount(); }
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            const selectedLevel = getSelectedLevel();
+            copyStaging.innerHTML = editor.innerHTML;
+            const currentCounts = countCodesInHTML(editor.innerHTML);
+            const ordered = orderedCounts(currentCounts);
+
+            let summaryHTML = '';
+            if (ordered.length) {
+                const quickSummaryText = getStudentQuickSummary(currentCounts);
+                const bulletLines = ordered.slice(0, 5).map(([code, count]) => `<li style="margin-bottom:6px;"><strong>[${code}]</strong> — ${count} time${count === 1 ? '' : 's'}</li>`).join('');
+                summaryHTML = `
+                    <hr style="border:0; border-top:2px solid #cbd5e1; margin: 20px 0;">
+                    <h3 style="color:#0f172a; margin-bottom: 10px;">Quick Summary</h3>
+                    <p style="margin:0 0 10px 0;">${quickSummaryText}</p>
+                    <ul style="padding-left: 20px; line-height: 1.6; margin: 0 0 8px 0;">${bulletLines}</ul>
+                `;
+            }
+
+            let legendHTML = '';
+            if (ordered.length) {
+                legendHTML = '<h3 style="color:#0f172a; margin: 18px 0 12px 0;">Feedback Legend & Examples</h3><ul style="padding-left: 20px; line-height: 1.6;">';
+                ordered.forEach(([code]) => {
+                    const data = codeData[code];
+                    if (!data) return;
+                    const exampleText = data.examples[selectedLevel];
+                    const exampleHTML = exampleText ? `<br><em style="color:#64748b; font-size: 0.95em;">Example: ${exampleText}</em>` : '';
+                    legendHTML += `<li style="margin-bottom: 12px;"><strong>[${code}]</strong>: ${data.explanation}${exampleHTML}</li>`;
+                });
+                legendHTML += '</ul>';
+            }
+
+            copyStaging.innerHTML += summaryHTML + legendHTML;
+
+            ordered.forEach(([code, count]) => { classSummaryCounts[code] = (classSummaryCounts[code] || 0) + count; });
+            saveClassSummary();
+
+            const ok = await copyHTMLToClipboard(copyStaging.innerHTML, copyStaging.innerText);
+            copyStaging.innerHTML = '';
+            showToast(ok ? (ordered.length ? 'Feedback, quick summary and legend copied.' : 'Text copied.') : 'Copy failed on this device.');
+            hideOverlays();
+        });
+
+        evidenceModeBtn.addEventListener('click', () => {
+            evidenceMode = !evidenceMode;
+            evidenceModeBtn.textContent = evidenceMode ? 'Evidence Mode: ON' : 'Evidence Mode: OFF';
+            showToast(evidenceMode ? 'Evidence codes are now visible.' : 'Evidence codes are now hidden.');
+            renderButtons();
+        });
+
+        // --- MODAL LOGIC ---
+        classSummaryBtn.addEventListener('click', () => {
+            hideOverlays();
+            modalBodyContent.innerHTML = getClassSummaryHTML();
             summaryModal.classList.add('visible');
-        };
-        document.getElementById('close-modal-btn').onclick = () => summaryModal.classList.remove('visible');
-        document.getElementById('favorites-toggle').onchange = (e) => { favoritesEnabled = e.target.checked; try{localStorage.setItem(STORAGE_PREFIX + 'favToggle', favoritesEnabled);}catch(e){} };
-        document.getElementById('tooltip-toggle').onchange = (e) => { tooltipsEnabled = e.target.checked; try{localStorage.setItem(STORAGE_PREFIX + 'tooltips', tooltipsEnabled);}catch(e){} };
-        document.getElementById('add-code-btn-1').onclick = () => { const v = document.getElementById('new-code-input-1').value.trim().toUpperCase(); if(v && !codeData[v]){codeData[v]={category:'structure', explanation:'Custom.'}; saveCustomCodes(); renderButtons(); document.getElementById('new-code-input-1').value=''; showToast('Added.');} };
-        document.getElementById('add-code-btn-2').onclick = () => { const v = document.getElementById('new-code-input-2').value.trim().toUpperCase(); if(v && !codeData[v]){codeData[v]={category:'expression', explanation:'Custom.'}; saveCustomCodes(); renderButtons(); document.getElementById('new-code-input-2').value=''; showToast('Added.');} };
+            copyResetBtn.dataset.confirm = 'false';
+            copyResetBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg> Copy & Reset Count`;
+        });
+
+        closeModalBtn.addEventListener('click', () => { summaryModal.classList.remove('visible'); });
+        summaryModal.addEventListener('click', (e) => { if (e.target === summaryModal) summaryModal.classList.remove('visible'); });
+
+        let copyResetConfirmTimeout;
+        copyResetBtn.addEventListener('click', async () => {
+            if (copyResetBtn.dataset.confirm === 'true') {
+                const html = getClassSummaryHTML();
+                const textWrapper = document.createElement('div'); textWrapper.innerHTML = html;
+                if (await copyHTMLToClipboard(html, textWrapper.innerText)) {
+                    classSummaryCounts = {}; saveClassSummary(); showToast('Summary copied and data reset.'); summaryModal.classList.remove('visible');
+                } else showToast('Copy failed. Data not reset.');
+                copyResetBtn.dataset.confirm = 'false';
+                copyResetBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg> Copy & Reset Count`;
+            } else {
+                copyResetBtn.dataset.confirm = 'true'; copyResetBtn.textContent = 'Are you sure? Click to confirm';
+                clearTimeout(copyResetConfirmTimeout);
+                copyResetConfirmTimeout = setTimeout(() => {
+                    copyResetBtn.dataset.confirm = 'false';
+                    copyResetBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg> Copy & Reset Count`;
+                }, 3000);
+            }
+        });
+
+        copyOnlyBtn.addEventListener('click', async () => {
+            const html = getClassSummaryHTML();
+            const textWrapper = document.createElement('div'); textWrapper.innerHTML = html;
+            if (await copyHTMLToClipboard(html, textWrapper.innerText)) { showToast('Class summary copied.'); summaryModal.classList.remove('visible'); } 
+            else showToast('Could not copy class summary.');
+        });
+
+        favoritesToggle.addEventListener('change', (e) => {
+            favoritesEnabled = e.target.checked;
+            try { localStorage.setItem(FAV_TOGGLE_PREF_KEY, JSON.stringify(favoritesEnabled)); } catch(e) {}
+        });
+
+        if (tooltipToggle) {
+            tooltipToggle.addEventListener('change', (e) => {
+                tooltipsEnabled = e.target.checked;
+                try { localStorage.setItem(TOOLTIP_PREF_KEY, JSON.stringify(tooltipsEnabled)); } catch(e) {}
+                if (!tooltipsEnabled) hideTooltip();
+            });
+        }
 
         if (savedDraft) { editor.innerHTML = savedDraft; checkPendingCount(); }
         renderButtons();
