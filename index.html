@@ -773,19 +773,37 @@
                 vagueTier2: ['many things', 'huge impact', "in today's society", 'back in the day', 'changed everything', 'played a role'],
                 vagueTier3: ['since the dawn of time', 'throughout history', 'human nature', 'society says', 'it is clear that', 'undeniable', 'needless to say'],
                 reportingVerbs: ['said', 'stated', 'argued', 'writes', 'notes', 'claims', 'suggests', 'implies', 'demonstrates', 'shows', 'explains', 'reveals', 'highlights', 'asserts', 'contends'],
+                pastMarkers: ['was', 'were', 'had', 'did', 'went', 'came', 'made', 'saw', 'told', 'became', 'looked', 'seemed', 'tried', 'wanted', 'needed', 'used', 'fought', 'returned', 'showed'],
+                presentMarkers: ['is', 'are', 'has', 'does', 'goes', 'comes', 'makes', 'sees', 'tells', 'becomes', 'looks', 'seems', 'tries', 'wants', 'needs', 'uses', 'fight', 'return', 'show'],
                 abbreviations: ['mr', 'mrs', 'ms', 'dr', 'prof', 'st', 'vs', 'i.e', 'e.g', 'etc']
             };
 
             function splitIntoSentences(text) {
-                let safeText = text.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/\.\.\./g, "___ELLIPSIS___");
-                DICTS.abbreviations.forEach(abbr => { safeText = safeText.replace(new RegExp(`\\b${abbr}\\.`, 'gi'), `${abbr}@@@`); });
-                const tokens = safeText.replace(/([.!?]+)(?=\s+["']?[A-Za-z])/g, "$1|SPLIT|").split("|SPLIT|");
+                // Ensure smart quotes are not destroyed in the raw text so we can match against HTML later
+                let splitText = text.replace(/\.\.\./g, "___ELLIPSIS___");
+                DICTS.abbreviations.forEach(abbr => { splitText = splitText.replace(new RegExp(`\\b${abbr}\\.`, 'gi'), `${abbr}@@@`); });
+                
+                // Keep the punctuation attached to the string segment
+                const tokens = splitText.replace(/([.!?]+)(?=\s+["”'’]?[A-Za-z])/g, "$1|SPLIT|").split("|SPLIT|");
+                
                 return tokens.map((raw, i) => {
                     let restored = raw.replace(/@@@/g, '.').replace(/___ELLIPSIS___/g, "...");
                     let trimmed = restored.trim();
                     if (!trimmed) return null;
-                    const words = trimmed.toLowerCase().replace(/[^a-z0-9'\s-]/gi, '').split(/\s+/).filter(Boolean);
-                    return { id: i, raw: restored, trimmed: trimmed, words: words, wordCount: words.length, commaCount: (trimmed.match(/,/g) || []).length, hasQuote: /["']/.test(trimmed) };
+                    
+                    // Normalize ONLY for the logic engine (convert smart quotes to straight just to analyze words)
+                    let normalized = trimmed.toLowerCase().replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
+                    const words = normalized.replace(/[^a-z0-9'\s-]/gi, '').split(/\s+/).filter(Boolean);
+                    
+                    return { 
+                        id: i, 
+                        raw: restored, 
+                        trimmed: trimmed, // This preserves original smart quotes for perfect regex matching!
+                        words: words, 
+                        wordCount: words.length, 
+                        commaCount: (trimmed.match(/,/g) || []).length, 
+                        hasQuote: /["“”]/.test(trimmed) 
+                    };
                 }).filter(Boolean);
             }
 
@@ -794,13 +812,66 @@
                     const cfg = CALIBRATION[level] || CALIBRATION.lower_sec;
                     const sentences = splitIntoSentences(text);
                     const flags = [];
-                    sentences.forEach((s) => {
-                        if (s.wordCount > cfg.runOnWordLimit && s.commaCount < cfg.runOnPunctMin) flags.push({ code: "SPLIT THIS RUN-ON", spanText: s.trimmed, reason: `Scan Report: ${s.wordCount} words, ${s.commaCount} commas.` });
-                        if (DICTS.subordinators.includes(s.words[0]) && s.commaCount === 0) flags.push({ code: "FIX THIS FRAGMENT", spanText: s.trimmed, reason: `Scan Report: Starts with '${s.words[0]}' without a main clause.` });
-                        let lists = [...DICTS.vagueTier1]; if(cfg.vagueTiers >= 2) lists.push(...DICTS.vagueTier2); if(cfg.vagueTiers === 3) lists.push(...DICTS.vagueTier3);
-                        for (const ph of lists) { if (new RegExp(`\\b${ph}\\b`, 'i').test(s.trimmed)) { flags.push({ code: "VAGUE STATEMENT", spanText: s.trimmed, reason: `Scan Report: Imprecise phrasing detected.` }); break; } }
-                        if (s.hasQuote && !s.words.some(w => DICTS.reportingVerbs.includes(w))) flags.push({ code: "QUOTE NOT INTRODUCED", spanText: s.trimmed, reason: "Scan Report: No reporting verb detected." });
-                        if (/^\s*[a-z]/.test(s.raw) || /(^|[\s(])i([\s,.!?;:)\]])/g.test(s.raw)) flags.push({ code: "PROOFREADING NEEDED", spanText: s.trimmed, reason: "Scan Report: Capitals error." });
+                    
+                    sentences.forEach((s, idx) => {
+                        // 1. Run-on 
+                        if (s.wordCount > cfg.runOnWordLimit && s.commaCount < cfg.runOnPunctMin) 
+                            flags.push({ code: "SPLIT THIS RUN-ON", spanText: s.trimmed, reason: `Scan Report: ${s.wordCount} words, ${s.commaCount} commas.` });
+                        
+                        // 2. Fragment
+                        if (s.words.length > 0 && DICTS.subordinators.includes(s.words[0]) && s.commaCount === 0 && s.wordCount < 15) 
+                            flags.push({ code: "FIX THIS FRAGMENT", spanText: s.trimmed, reason: `Scan Report: Starts with '${s.words[0]}' without a main clause.` });
+                        
+                        // 3. Vague Statements
+                        let lists = [...DICTS.vagueTier1]; 
+                        if(cfg.vagueTiers >= 2) lists.push(...DICTS.vagueTier2); 
+                        if(cfg.vagueTiers === 3) lists.push(...DICTS.vagueTier3);
+                        for (const ph of lists) { 
+                            if (new RegExp(`\\b${ph}\\b`, 'i').test(s.trimmed)) { 
+                                flags.push({ code: "VAGUE STATEMENT", spanText: s.trimmed, reason: `Scan Report: Imprecise phrasing detected.` }); 
+                                break; // Only 1 vague flag per sentence
+                            } 
+                        }
+                        
+                        // 4. Quote Intro
+                        if (s.hasQuote && s.words.length > 0 && !s.words.some(w => DICTS.reportingVerbs.includes(w))) 
+                            flags.push({ code: "QUOTE NOT INTRODUCED", spanText: s.trimmed, reason: "Scan Report: No reporting verb detected." });
+                        
+                        // 5. Proofreading (Capitals)
+                        if (/^\s*[a-z]/.test(s.raw) || /(^|[\s(])i([\s,.!?;:)\]])/g.test(s.raw)) 
+                            flags.push({ code: "PROOFREADING NEEDED", spanText: s.trimmed, reason: "Scan Report: Capitals error." });
+                            
+                        // 6. Mix Tense
+                        let pastCount = s.words.filter(w => DICTS.pastMarkers.includes(w)).length;
+                        let presCount = s.words.filter(w => DICTS.presentMarkers.includes(w)).length;
+                        if (pastCount > 0 && presCount > 0 && (pastCount + presCount) >= 2) {
+                            flags.push({ code: "MIXING TENSE", spanText: s.trimmed, reason: `Scan Report: Mixed past and present tense verbs.` });
+                        }
+                        
+                        // 7. Repetition (Internal & Adjacent)
+                        const longWords = s.words.filter(w => w.length >= cfg.repetitionStemLength && !DICTS.vagueTier1.includes(w) && !DICTS.fanboys.includes(w) && !DICTS.subordinators.includes(w));
+                        let repeated = false;
+                        
+                        // Check Internal Repetition
+                        const roots = new Set();
+                        for (let w of longWords) {
+                            const stem = w.substring(0, cfg.repetitionStemLength);
+                            if (roots.has(stem)) { repeated = true; break; }
+                            roots.add(stem);
+                        }
+                        
+                        // Check Adjacent Repetition
+                        if (!repeated && idx > 0) {
+                            const prevWords = sentences[idx - 1].words.filter(w => w.length >= cfg.repetitionStemLength);
+                            for (let w of longWords) {
+                                const stem = w.substring(0, cfg.repetitionStemLength);
+                                if (prevWords.some(pw => pw.startsWith(stem))) { repeated = true; break; }
+                            }
+                        }
+                        
+                        if (repeated) {
+                            flags.push({ code: "REPETITION", spanText: s.trimmed, reason: `Scan Report: Repeated vocabulary detected.` });
+                        }
                     });
                     return flags;
                 }
@@ -985,13 +1056,28 @@
         function runAutoMark() {
             const text = editor.innerText.trim(); if(!text) return; magicBtn.classList.add('loading');
             const flags = RapidEngine.analyze(text, getSelectedLevel()); let html = editor.innerHTML;
+            
             flags.forEach(f => {
-                const escaped = f.spanText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // Safely escape special characters from the sentence string
+                let escaped = f.spanText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                
+                // CRITICAL FIX: Convert HTML entities so innerHTML matches correctly (smart quotes, ampersands, etc.)
+                escaped = escaped.replace(/&/g, '&amp;')
+                                 .replace(/</g, '&lt;')
+                                 .replace(/>/g, '&gt;')
+                                 .replace(/"/g, '(?:"|&quot;)')
+                                 .replace(/'/g, "(?:'|&#39;|&apos;)");
+                
+                // Allow spaces or newlines to bridge across HTML tags (like <br> or <div> created by the browser)
                 const regexStr = escaped.replace(/\s+/g, '(?:\\s|&nbsp;|<[^>]+>)+');
+                
+                // Find the sentence, but ensure we don't accidentally double-tag an already flagged sentence
                 const regex = new RegExp(`(${regexStr})(?!\\s*<span class="pending-tag")`, 'i');
                 const tag = `<span class="pending-tag" contenteditable="false" data-reason="${f.reason}"><span class="pending-action pending-accept">✓</span><span class="pending-label">${f.code}</span><span class="pending-action pending-reject">✗</span></span>`;
+                
                 if (regex.test(html)) html = html.replace(regex, `$1 ${tag}`);
             });
+            
             editor.innerHTML = html; magicBtn.classList.remove('loading'); checkPendingCount(); saveDraft(); updateWordCount();
         }
 
@@ -1026,7 +1112,7 @@
             }
         });
 
-        // Fix: Force Plain Text on Paste to prevent tiny fonts from Word/Google Docs
+        // Force Plain Text on Paste to prevent tiny fonts from Word/Google Docs
         editor.addEventListener('paste', (e) => { 
             e.preventDefault();
             // Get the raw plain text from the clipboard, ignoring all HTML styling
