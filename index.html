@@ -270,7 +270,7 @@
             font-weight: 600;
         }
 
-        /* Pending Auto-Mark Suggestion Tag */
+        /* Pending Auto-Mark Suggestion Tag (Shrunk) */
         .pending-tag {
             display: inline-flex;
             align-items: center;
@@ -279,18 +279,18 @@
             padding: 0;
             border-radius: 4px;
             font-weight: 700;
-            font-size: 0.85em;
+            font-size: 0.72rem; /* Shrunk from 0.85em */
             margin: 0 4px;
-            vertical-align: baseline;
+            vertical-align: middle;
             overflow: hidden;
             user-select: none;
             border: 1px solid #e2e8f0;
             transition: all 0.2s;
         }
-        .pending-action { padding: 2px 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .pending-action { padding: 1px 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; } /* Reduced padding */
         .pending-accept { color: var(--success); border-right: 1px solid #e2e8f0; }
         .pending-accept:hover { background: #dcfce7; }
-        .pending-label { padding: 2px 8px; cursor: pointer; color: var(--text); }
+        .pending-label { padding: 1px 6px; cursor: pointer; color: var(--text); } /* Reduced padding */
         .pending-label:hover { background: #e2e8f0; }
         .pending-reject { color: var(--danger); border-left: 1px solid #e2e8f0; }
         .pending-reject:hover { background: #fee2e2; }
@@ -472,15 +472,15 @@
             gap: 6px;
         }
 
-        /* Popup styling upgraded for Grid Layout (Columns of 6) */
+        /* Popup styling upgraded: position fixed + insane z-index to break container bounds */
         #favorites-popup {
-            position: absolute;
+            position: fixed; 
             display: none;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 8px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            z-index: 9999; 
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+            z-index: 99999; 
             padding: 6px;
             min-width: 180px;
             flex-direction: column;
@@ -501,12 +501,12 @@
             background: transparent;
             border: none;
             text-align: left;
-            padding: 8px 12px;
+            padding: 6px 10px; /* Reduced from 8px 12px */
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             color: var(--text);
-            font-size: 0.85rem;
+            font-size: 0.72rem; /* Reduced text size */
             transition: background 0.15s;
             white-space: nowrap;
         }
@@ -634,9 +634,8 @@
                 <div id="editor" contenteditable="true" data-placeholder="1. Paste student text here.&#10;2. Double-click or drag text to highlight it and type an inline comment.&#10;3. Single-click to select a rubric code from the Favourites menu.&#10;4. Tap ✨ to auto-scan for feedback."></div>
 
                 <button class="floating-remove-btn" id="remove-code-btn">Remove</button>
-                <div id="favorites-popup"></div>
 
-                <div class="editor-footer">
+                <div class="editor-footer" style="position: relative;">
                     <div class="footer-group">
                         <button class="action-btn secondary" id="clear-btn">Clear Text</button>
                         <button class="action-btn secondary" id="undo-btn" disabled title="Undo (Ctrl+Z)">
@@ -710,6 +709,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Moved to body level to break completely free of container clipping -->
+    <div id="favorites-popup"></div>
 
     <div id="toast">Copied to clipboard.</div>
     <div id="copy-staging"></div>
@@ -1405,18 +1407,18 @@
             favPopup.classList.add('visible');
             
             requestAnimationFrame(() => {
-                const wr = editorWrapper.getBoundingClientRect();
                 const popupRect = favPopup.getBoundingClientRect();
                 
-                let top = event.clientY - wr.top + 15;
-                let left = event.clientX - wr.left;
+                let top = event.clientY + 15;
+                let left = event.clientX;
 
-                if (left + popupRect.width > wr.width) {
-                    left = wr.width - popupRect.width - 20; 
+                // Fixed positioning logic uses the entire viewport window
+                if (left + popupRect.width > window.innerWidth) {
+                    left = window.innerWidth - popupRect.width - 20; 
                 }
                 
-                if (top + popupRect.height > wr.height) {
-                    top = event.clientY - wr.top - popupRect.height - 15;
+                if (top + popupRect.height > window.innerHeight) {
+                    top = event.clientY - popupRect.height - 15;
                 }
                 if (top < 10) top = 10; 
                 
@@ -1516,15 +1518,14 @@
                     favPopup.classList.add('visible');
 
                     requestAnimationFrame(() => {
-                        const wr = editorWrapper.getBoundingClientRect();
                         const popupRect = favPopup.getBoundingClientRect();
-                        let top = e.clientY - wr.top + 15; 
-                        let left = e.clientX - wr.left;
+                        let top = e.clientY + 15; 
+                        let left = e.clientX;
                         
-                        if (left + popupRect.width > wr.width) left = wr.width - popupRect.width - 20;
+                        if (left + popupRect.width > window.innerWidth) left = window.innerWidth - popupRect.width - 20;
                         
-                        if (top + popupRect.height > wr.height) {
-                            top = e.clientY - wr.top - popupRect.height - 15;
+                        if (top + popupRect.height > window.innerHeight) {
+                            top = e.clientY - popupRect.height - 15;
                         }
                         if (top < 10) top = 10;
                         
@@ -1576,17 +1577,16 @@
                             favPopup.classList.add('visible');
                             
                             requestAnimationFrame(() => {
-                                const wr = editorWrapper.getBoundingClientRect();
                                 const popupRect = favPopup.getBoundingClientRect();
                                 const strongRect = strongNode.getBoundingClientRect();
                                 
-                                let top = strongRect.bottom - wr.top + 5;
-                                let left = strongRect.left - wr.left;
+                                let top = strongRect.bottom + 5;
+                                let left = strongRect.left;
                                 
-                                if (left + popupRect.width > wr.width) left = wr.width - popupRect.width - 20;
+                                if (left + popupRect.width > window.innerWidth) left = window.innerWidth - popupRect.width - 20;
                                 
-                                if (top + popupRect.height > wr.height) {
-                                    top = strongRect.top - wr.top - popupRect.height - 5;
+                                if (top + popupRect.height > window.innerHeight) {
+                                    top = strongRect.top - popupRect.height - 5;
                                 }
                                 if (top < 10) top = 10;
                                 
