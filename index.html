@@ -553,7 +553,7 @@
             background: var(--surface);
             border-radius: 12px;
             width: 90%;
-            max-width: 600px;
+            max-width: 800px;
             max-height: 85vh;
             display: flex;
             flex-direction: column;
@@ -603,7 +603,7 @@
                 <label for="lvl-upper">Upper Secondary</label>
             </div>
             <button class="action-btn success" id="class-summary-btn">Class Summary</button>
-            <button class="action-btn admin" id="open-admin-btn">⚙️ Deploy</button>
+            <button class="action-btn admin" id="open-admin-btn">⚙️ CREATE</button>
         </div>
     </div>
 
@@ -750,7 +750,7 @@
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Faculty Deploy: Custom Rubric</h2>
+                <h2>Create Custom App</h2>
                 <button class="modal-close" id="close-admin-btn">&times;</button>
             </div>
             <div class="modal-body">
@@ -834,6 +834,7 @@
         const FAVORITES_KEY = 'annotatorFavorites_' + APP_ID;
         const TOOLTIP_PREF_KEY = 'annotatorTooltipsEnabled_' + APP_ID;
         const FAV_TOGGLE_PREF_KEY = 'annotatorFavoritesToggle_' + APP_ID;
+        const LAST_COPIED_KEY = 'annotatorLastCopied_' + APP_ID; // NEW: Net tracking key
 
         let savedCustomCodes = {};
         let classSummaryCounts = {};
@@ -842,6 +843,7 @@
         let favoritesEnabled = true;
         let savedDraft = null;
         let selectedWECCodes = new Set(); 
+        let lastCopiedCounts = {}; // NEW: Net tracking state
 
         if (!localStorage.getItem(FAVORITES_KEY)) {
             const defaultFavs = ["FIX THIS FRAGMENT", "SPLIT THIS RUN-ON", "AWKWARD PHRASING"];
@@ -855,6 +857,7 @@
         try { const tpref = localStorage.getItem(TOOLTIP_PREF_KEY); if (tpref !== null) tooltipsEnabled = JSON.parse(tpref); } catch (e) {}
         try { const fpref = localStorage.getItem(FAV_TOGGLE_PREF_KEY); if (fpref !== null) favoritesEnabled = JSON.parse(fpref); } catch (e) {}
         try { savedDraft = localStorage.getItem(EDITOR_DRAFT_KEY); } catch (e) {}
+        try { lastCopiedCounts = JSON.parse(localStorage.getItem(LAST_COPIED_KEY) || '{}'); } catch (e) {}
 
         const codeData = { ...baseCodeData, ...savedCustomCodes };
         
@@ -935,6 +938,7 @@
             try { localStorage.setItem(WEC_DRAFT_KEY, JSON.stringify(Array.from(selectedWECCodes))); } catch(e){}
         };
         const saveClassSummary = () => { try { localStorage.setItem(CLASS_SUMMARY_KEY, JSON.stringify(classSummaryCounts)); } catch (e) {} };
+        const saveLastCopied = () => { try { localStorage.setItem(LAST_COPIED_KEY, JSON.stringify(lastCopiedCounts)); } catch (e) {} };
         const saveCustomCodes = () => {
             const customOnly = {};
             Object.keys(codeData).forEach(key => { if (!baseCodeData[key]) customOnly[key] = codeData[key]; });
@@ -1012,7 +1016,7 @@
 
         const getClassSummaryHTML = () => {
             const ordered = orderedCounts(classSummaryCounts);
-            if (!ordered.length) return '<p style="margin:0;">Class Summary: No feedback has been recorded yet.</p>';
+            if (!ordered.length) return '<div style="font-family: \'Segoe UI\', system-ui, -apple-system, sans-serif; font-size: 11pt; color: #334155; padding: 10px; background-color: #ffffff;"><p style="margin:0;">Class Summary: No feedback has been recorded yet.</p></div>';
 
             const rows = ordered.map(([code, count], index) => {
                 let categoryDisplay = 'Expression';
@@ -1020,27 +1024,39 @@
                 else if (codeData[code]?.category === 'whole_essay') categoryDisplay = 'Whole Essay';
 
                 return `<tr>
-                    <td style="padding:8px 10px; border:1px solid #cbd5e1;">${index + 1}</td>
-                    <td style="padding:8px 10px; border:1px solid #cbd5e1;"><strong>${code}</strong></td>
-                    <td style="padding:8px 10px; border:1px solid #cbd5e1;">${categoryDisplay}</td>
-                    <td style="padding:8px 10px; border:1px solid #cbd5e1;">${count}</td>
+                    <td width="8%" valign="top" style="padding: 8px 12px 8px 0; border-bottom: 1px solid #e2e8f0; width: 8%; word-wrap: break-word;">
+                        <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 10.5pt; color: #64748b;">${index + 1}</div>
+                    </td>
+                    <td width="55%" valign="top" style="padding: 8px 12px 8px 0; border-bottom: 1px solid #e2e8f0; width: 55%; word-wrap: break-word;">
+                        <strong style="color: #0284c7; font-size: 10.5pt; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${code}</strong>
+                    </td>
+                    <td width="25%" valign="top" style="padding: 8px 12px 8px 0; border-bottom: 1px solid #e2e8f0; width: 25%; word-wrap: break-word;">
+                        <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 10.5pt; color: #64748b;">${categoryDisplay}</div>
+                    </td>
+                    <td width="12%" valign="top" style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; width: 12%; word-wrap: break-word;">
+                        <strong style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11pt; color: #0f172a;">${count}</strong>
+                    </td>
                 </tr>`;
             }).join('');
 
             return `
-                <h3 style="color:#0f172a; margin:0 0 10px 0;">Class Summary</h3>
-                <p style="margin:0 0 12px 0; color:#475569;">Most common issues across the class, from most frequent to least.</p>
-                <table style="border-collapse:collapse; width:100%; font-size:0.95rem;">
-                    <thead>
-                        <tr>
-                            <th style="text-align:left; padding:8px 10px; border:1px solid #cbd5e1; background:#f8fafc;">#</th>
-                            <th style="text-align:left; padding:8px 10px; border:1px solid #cbd5e1; background:#f8fafc;">Code</th>
-                            <th style="text-align:left; padding:8px 10px; border:1px solid #cbd5e1; background:#f8fafc;">Category</th>
-                            <th style="text-align:left; padding:8px 10px; border:1px solid #cbd5e1; background:#f8fafc;">Count</th>
-                        </tr>
-                    </thead>
-                    <tbody>${rows}</tbody>
-                </table>
+                <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11pt; color: #334155; line-height: 1.6; max-width: 100%; width: 100%; background-color: #ffffff; padding: 2px;">
+                    <div style="margin-bottom: 20px; background-color: #ffffff;">
+                        <strong style="display: block; font-size: 12pt; color: #0f172a; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Class Summary Report</strong>
+                        <div style="font-size: 10.5pt; color: #64748b; margin-bottom: 16px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Most common issues across the class, from most frequent to least.</div>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; background-color: #ffffff;">
+                            <thead>
+                                <tr>
+                                    <th width="8%" style="width: 8%; text-align: left; padding: 0 12px 8px 0; border-bottom: 2px solid #cbd5e1; color: #0f172a; font-size: 10pt; text-transform: uppercase; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">#</th>
+                                    <th width="55%" style="width: 55%; text-align: left; padding: 0 12px 8px 0; border-bottom: 2px solid #cbd5e1; color: #0f172a; font-size: 10pt; text-transform: uppercase; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Code</th>
+                                    <th width="25%" style="width: 25%; text-align: left; padding: 0 12px 8px 0; border-bottom: 2px solid #cbd5e1; color: #0f172a; font-size: 10pt; text-transform: uppercase; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Category</th>
+                                    <th width="12%" style="width: 12%; text-align: left; padding: 0 0 8px 0; border-bottom: 2px solid #cbd5e1; color: #0f172a; font-size: 10pt; text-transform: uppercase; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                </div>
             `;
         };
 
@@ -1653,11 +1669,6 @@
 
         removeCodeBtn.addEventListener('click', () => {
             if (activeTag) { 
-                const code = activeTag.textContent.replace(/^\[/, '').replace(/\]$/, '').trim();
-                if (classSummaryCounts[code] > 0) {
-                    classSummaryCounts[code]--;
-                    saveClassSummary();
-                }
                 activeTag.remove(); 
                 activeTag = null; 
                 removeCodeBtn.classList.remove('visible'); 
@@ -1681,6 +1692,8 @@
                 hideOverlays(); 
                 saveDraft(); 
                 saveHistory(); 
+                lastCopiedCounts = {}; // Reset tracking for next student
+                saveLastCopied();
             }
         });
 
@@ -1753,7 +1766,22 @@
 
             copyStaging.innerHTML = finalHTML;
 
-            ordered.forEach(([code, count]) => { classSummaryCounts[code] = (classSummaryCounts[code] || 0) + count; });
+            // NEW: Smart Class Summary Net Tracking (Fixes inflation)
+            Object.keys(currentCounts).forEach(code => {
+                const diff = currentCounts[code] - (lastCopiedCounts[code] || 0);
+                if (diff !== 0) {
+                    classSummaryCounts[code] = Math.max(0, (classSummaryCounts[code] || 0) + diff);
+                }
+            });
+            Object.keys(lastCopiedCounts).forEach(code => {
+                if (!currentCounts[code]) {
+                    const diff = 0 - lastCopiedCounts[code];
+                    classSummaryCounts[code] = Math.max(0, (classSummaryCounts[code] || 0) + diff);
+                }
+            });
+
+            lastCopiedCounts = { ...currentCounts };
+            saveLastCopied();
             saveClassSummary();
 
             const ok = await copyHTMLToClipboard(copyStaging.innerHTML, copyStaging.innerText);
@@ -1770,6 +1798,46 @@
             });
         }
 
+        // --- RESTORED: MODAL LOGIC (Summary) ---
+        classSummaryBtn.addEventListener('click', () => {
+            hideOverlays();
+            modalBodyContent.innerHTML = getClassSummaryHTML();
+            summaryModal.classList.add('visible');
+            copyResetBtn.dataset.confirm = 'false';
+            copyResetBtn.innerHTML = `Copy & Reset Count`;
+        });
+
+        closeModalBtn.addEventListener('click', () => { summaryModal.classList.remove('visible'); });
+        summaryModal.addEventListener('click', (e) => { if (e.target === summaryModal) summaryModal.classList.remove('visible'); });
+
+        let copyResetConfirmTimeout;
+        copyResetBtn.addEventListener('click', async () => {
+            if (copyResetBtn.dataset.confirm === 'true') {
+                const html = getClassSummaryHTML();
+                const textWrapper = document.createElement('div'); textWrapper.innerHTML = html;
+                if (await copyHTMLToClipboard(html, textWrapper.innerText)) {
+                    classSummaryCounts = {}; saveClassSummary(); showToast('Summary copied and data reset.'); summaryModal.classList.remove('visible');
+                } else showToast('Copy failed. Data not reset.');
+                copyResetBtn.dataset.confirm = 'false';
+                copyResetBtn.innerHTML = `Copy & Reset Count`;
+            } else {
+                copyResetBtn.dataset.confirm = 'true'; copyResetBtn.textContent = 'Are you sure? Click to confirm';
+                clearTimeout(copyResetConfirmTimeout);
+                copyResetConfirmTimeout = setTimeout(() => {
+                    copyResetBtn.dataset.confirm = 'false';
+                    copyResetBtn.innerHTML = `Copy & Reset Count`;
+                }, 3000);
+            }
+        });
+
+        copyOnlyBtn.addEventListener('click', async () => {
+            const html = getClassSummaryHTML();
+            const textWrapper = document.createElement('div'); textWrapper.innerHTML = html;
+            if (await copyHTMLToClipboard(html, textWrapper.innerText)) { showToast('Class summary copied.'); summaryModal.classList.remove('visible'); } 
+            else showToast('Could not copy class summary.');
+        });
+
+        // --- ADMIN / DEPLOY LOGIC ---
         openAdminBtn.addEventListener('click', () => {
             hideOverlays();
             adminModal.classList.add('visible');
@@ -1779,14 +1847,47 @@
         adminModal.addEventListener('click', (e) => { if (e.target === adminModal) adminModal.classList.remove('visible'); });
 
         document.getElementById('download-template-btn').addEventListener('click', () => {
-            const headers = ["Category (structure/expression/evidence/whole_essay)", "Code", "Explanation", "Upper Primary Feedback", "Lower Secondary Feedback", "Upper Secondary Feedback"];
-            const sampleRow = ["structure", "FIX THIS FRAGMENT", "This is an incomplete sentence.", "Because I was tired. -> I slept because I was tired.", "Running through the dark forest. -> She was running through the dark.", "Although it rained. -> Although it rained, we played."];
-            const sampleRow2 = ["expression", "AWKWARD PHRASING", "This wording sounds unnatural.", "", "We used glue for making it. -> We used glue to make it.", ""];
-            const sampleRow3 = ["whole_essay", "WEAK CONCLUSION", "The ending does not wrap up the argument effectively.", "Your ending repeats ideas but doesn’t finish strongly.", "Conclusion is repetitive and lacks impact.", "The conclusion lacks synthesis and insight."];
+            const headers = ["Category (structure/expression/whole_essay)", "Code", "Explanation", "Upper Primary Feedback", "Lower Secondary Feedback", "Upper Secondary Feedback"];
             
-            let csvContent = [headers, sampleRow, sampleRow2, sampleRow3]
-                .map(e => e.map(item => `"${item.replace(/"/g, '""')}"`).join(","))
-                .join("\n");
+            const rows = [headers];
+            
+            // 10 Structure Rows
+            rows.push(["structure", "FIX THIS FRAGMENT", "This is an incomplete sentence.", "Because I was tired. -> I slept because I was tired.", "Running through the dark forest. -> She was running through the dark.", "Although it rained. -> Although it rained, we played."]);
+            rows.push(["structure", "SPLIT THIS RUN-ON", "Two or more complete sentences are joined without proper punctuation.", "", "", ""]);
+            rows.push(["structure", "MIXING TENSE", "Keep your verbs in the same time period.", "", "", ""]);
+            rows.push(["structure", "REPEATED IDEA", "You have already made this point.", "", "", ""]);
+            rows.push(["structure", "EXPAND IDEA", "Give more detail, context, or evidence.", "", "", ""]);
+            rows.push(["structure", "ADD MORE DEPTH", "Go beyond summary. Analyse how or why it matters.", "", "", ""]);
+            rows.push(["structure", "EXPLAIN WHY", "Support this point with a reason.", "", "", ""]);
+            rows.push(["structure", "CHECK WORD COUNT", "This section may be too brief or too long.", "", "", ""]);
+            rows.push(["structure", "PARAGRAPH TOO LONG", "Break this paragraph into two smaller ones.", "", "", ""]);
+            rows.push(["structure", "MISSING TOPIC SENTENCE", "Start the paragraph with a clear point.", "", "", ""]);
+
+            // 10 Expression Rows
+            rows.push(["expression", "AWKWARD PHRASING", "This wording sounds unnatural.", "", "We used glue for making it. -> We used glue to make it.", ""]);
+            rows.push(["expression", "PROOFREADING NEEDED", "Check spelling, punctuation, capitals.", "", "", ""]);
+            rows.push(["expression", "SENTENCE UNCLEAR", "The meaning is difficult to follow.", "", "", ""]);
+            rows.push(["expression", "VAGUE STATEMENT", "This point is too general.", "", "", ""]);
+            rows.push(["expression", "TOO MANY STOP WORDS", "Cut filler words and weak wording.", "", "", ""]);
+            rows.push(["expression", "INFORMAL TONE", "Keep your writing more formal.", "", "", ""]);
+            rows.push(["expression", "INCORRECT WORD CHOICE", "This is not the right word for this context.", "", "", ""]);
+            rows.push(["expression", "SPELLING ERROR", "Check your spelling.", "", "", ""]);
+            rows.push(["expression", "PUNCTUATION ERROR", "Check your commas and full stops.", "", "", ""]);
+            rows.push(["expression", "CAPITALISATION ERROR", "Check your capital letters.", "", "", ""]);
+
+            // 10 Whole Essay Rows
+            rows.push(["whole_essay", "WEAK CONCLUSION", "The ending does not wrap up the argument effectively.", "Your ending repeats ideas but doesn’t finish strongly.", "Conclusion is repetitive and lacks impact.", "The conclusion lacks synthesis and insight."]);
+            rows.push(["whole_essay", "WEAK TOPIC SENTENCES", "Paragraphs lack a clear opening point.", "", "", ""]);
+            rows.push(["whole_essay", "WEAK DEVELOPMENT", "Ideas need further expansion and detail.", "", "", ""]);
+            rows.push(["whole_essay", "POOR FLOW", "Sentences and ideas do not transition smoothly.", "", "", ""]);
+            rows.push(["whole_essay", "REPETITION OF IDEAS", "The same concepts are being repeated.", "", "", ""]);
+            rows.push(["whole_essay", "WEAK EVIDENCE", "Claims need stronger supporting examples.", "", "", ""]);
+            rows.push(["whole_essay", "POOR INTEGRATION", "Quotes or examples are dropped in awkwardly.", "", "", ""]);
+            rows.push(["whole_essay", "TOO MUCH EVIDENCE", "Too many quotes without enough explanation.", "", "", ""]);
+            rows.push(["whole_essay", "RETELLING", "Summarising the plot rather than examining the meaning.", "", "", ""]);
+            rows.push(["whole_essay", "WEAK LINK", "Paragraphs do not clearly connect to the main thesis.", "", "", ""]);
+
+            let csvContent = rows.map(e => e.map(item => `"${item.replace(/"/g, '""')}"`).join(",")).join("\n");
                 
             let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             let link = document.createElement("a");
