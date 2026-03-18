@@ -750,7 +750,7 @@
     <div id="admin-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Create Custom App</h2>
+                <h2>Faculty Deploy: Custom Rubric</h2>
                 <button class="modal-close" id="close-admin-btn">&times;</button>
             </div>
             <div class="modal-body">
@@ -803,7 +803,6 @@
             'VAGUE STATEMENT': { category: 'expression', explanation: 'This point is too general. Add something specific.', examples: { upper_primary: 'The book was good. ➔ The book was exciting because of the plot twists.', lower_sec: 'People think pollution is bad. ➔ Many people argue that plastic pollution harms sea life.', upper_sec: 'Society has changed a lot. ➔ Technology has significantly changed how people communicate.' } },
             'TOO MANY STOP WORDS': { category: 'expression', explanation: 'Cut filler words and weak wording so the sentence sounds stronger.', examples: { upper_primary: 'It was really very big. ➔ It was enormous.', lower_sec: 'I just think that it is basically true. ➔ I believe it is true.', upper_sec: 'In my personal opinion, it is completely evident that... ➔ It is evident that...' } },
             
-            // Restored Evidence Codes
             'ADD EVIDENCE': { category: 'evidence', explanation: 'Support your claim with a quotation, example, or factual detail from the text or source.', examples: { upper_primary: 'Add a sentence showing where this idea appears in the text.', lower_sec: 'Include a quote or specific detail from the text.', upper_sec: 'Integrate a relevant quotation or reference from the source.' } },
             'EXPLAIN THE EVIDENCE': { category: 'evidence', explanation: 'Do not leave the quote alone. Explain how it proves your point.', examples: { upper_primary: 'Explain how the example proves your idea.', lower_sec: 'Show how the quote supports your argument.', upper_sec: 'Analyse the evidence and connect it to your claim.' } },
             'LINK BACK TO QUESTION': { category: 'evidence', explanation: 'Your paragraph should clearly connect back to the essay question or argument.', examples: { upper_primary: 'Remind the reader what the question is asking.', lower_sec: 'Connect this idea clearly to the task question.', upper_sec: 'Explicitly link this analysis back to your thesis.' } },
@@ -827,23 +826,23 @@
         // --- BASE_CODE_DATA_END ---
 
         const APP_ID = document.title.replace(/[^a-zA-Z0-9]/g, '_');
-        const CUSTOM_STORAGE_KEY = 'annotatorCustomCodes_' + APP_ID;
-        const CLASS_SUMMARY_KEY = 'annotatorClassSummary_' + APP_ID;
-        const EDITOR_DRAFT_KEY = 'annotatorEditorDraft_' + APP_ID;
+        const CUSTOM_STORAGE_KEY = 'annotatorCustomCodesV2';
+        const CLASS_SUMMARY_KEY = 'annotatorClassSummaryV2';
+        const EDITOR_DRAFT_KEY = 'annotatorEditorDraftV2';
         const WEC_DRAFT_KEY = 'annotatorWECDraft_' + APP_ID;
-        const FAVORITES_KEY = 'annotatorFavorites_' + APP_ID;
-        const TOOLTIP_PREF_KEY = 'annotatorTooltipsEnabled_' + APP_ID;
-        const FAV_TOGGLE_PREF_KEY = 'annotatorFavoritesToggle_' + APP_ID;
-        const LAST_COPIED_KEY = 'annotatorLastCopied_' + APP_ID; // NEW: Net tracking key
+        const FAVORITES_KEY = 'annotatorFavoritesV2';
+        const TOOLTIP_PREF_KEY = 'annotatorTooltipsEnabledV2';
+        const FAV_TOGGLE_PREF_KEY = 'annotatorFavoritesToggleV2';
+        const LAST_COPIED_KEY = 'annotatorLastCopied_' + APP_ID; 
 
         let savedCustomCodes = {};
         let classSummaryCounts = {};
-        let favoriteCodes = [];
+        let favoriteCodes = ["AWKWARD PHRASING", "FIX THIS FRAGMENT", "EXPAND IDEA"];
         let tooltipsEnabled = true;
         let favoritesEnabled = true;
         let savedDraft = null;
         let selectedWECCodes = new Set(); 
-        let lastCopiedCounts = {}; // NEW: Net tracking state
+        let lastCopiedCounts = {};
 
         if (!localStorage.getItem(FAVORITES_KEY)) {
             const defaultFavs = ["FIX THIS FRAGMENT", "SPLIT THIS RUN-ON", "AWKWARD PHRASING"];
@@ -993,18 +992,14 @@
 
         const getSelectedLevel = () => document.querySelector('input[name="student-level"]:checked').value;
 
-        // Tightly controlled counting function: NO brackets
         const countCodesInHTML = (html) => {
             const temp = document.createElement('div');
             temp.innerHTML = html;
             const counts = {};
             temp.querySelectorAll('strong').forEach(tag => {
                 let text = tag.textContent.trim();
-                if (text === '[]') return; // Ignore completely empty brackets
-                
-                // Safely strip off legacy brackets just in case they snuck in
+                if (text === '[]') return; 
                 let code = text.replace(/^\[/, '').replace(/\]$/, '').trim();
-                
                 if (codeData[code]) {
                     counts[code] = (counts[code] || 0) + 1;
                 }
@@ -1028,13 +1023,13 @@
                         <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 10.5pt; color: #64748b;">${index + 1}</div>
                     </td>
                     <td width="55%" valign="top" style="padding: 8px 12px 8px 0; border-bottom: 1px solid #e2e8f0; width: 55%; word-wrap: break-word;">
-                        <strong style="color: #0284c7; font-size: 10.5pt; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${code}</strong>
+                        <span style="color: #0284c7; font-weight: bold; font-size: 10.5pt; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${code}</span>
                     </td>
                     <td width="25%" valign="top" style="padding: 8px 12px 8px 0; border-bottom: 1px solid #e2e8f0; width: 25%; word-wrap: break-word;">
                         <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 10.5pt; color: #64748b;">${categoryDisplay}</div>
                     </td>
                     <td width="12%" valign="top" style="padding: 8px 0; border-bottom: 1px solid #e2e8f0; width: 12%; word-wrap: break-word;">
-                        <strong style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11pt; color: #0f172a;">${count}</strong>
+                        <span style="font-weight: bold; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11pt; color: #0f172a;">${count}</span>
                     </td>
                 </tr>`;
             }).join('');
@@ -1042,7 +1037,7 @@
             return `
                 <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11pt; color: #334155; line-height: 1.6; max-width: 100%; width: 100%; background-color: #ffffff; padding: 2px;">
                     <div style="margin-bottom: 20px; background-color: #ffffff;">
-                        <strong style="display: block; font-size: 12pt; color: #0f172a; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Class Summary Report</strong>
+                        <div style="display: block; font-weight: bold; font-size: 12pt; color: #0f172a; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Class Summary Report</div>
                         <div style="font-size: 10.5pt; color: #64748b; margin-bottom: 16px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Most common issues across the class, from most frequent to least.</div>
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; background-color: #ffffff;">
                             <thead>
@@ -1061,7 +1056,7 @@
         };
 
         const hideOverlays = () => {
-            activeTag = null; 
+            if (activeTag) { activeTag.classList.remove('selected'); activeTag = null; }
             removeCodeBtn.classList.remove('visible');
             favPopup.classList.remove('visible');
             clearTimeout(favPopupTimer);
@@ -1102,7 +1097,6 @@
                 ${exampleText ? `<div style="margin-top:6px; color:#cbd5e1; font-style:italic;">Feedback: ${exampleText}</div>` : ''}
             `;
             
-            // Make tooltip block temporarily to measure dimensions properly without showing it yet
             tooltip.style.visibility = 'hidden';
             tooltip.style.display = 'block';
             
@@ -1112,17 +1106,14 @@
             let top = 0;
             let left = 0;
 
-            // If it's a Whole Essay Code, position tooltip ABOVE the button
             if (btn.classList.contains('wec-code-btn')) {
                 left = rect.left;
                 top = rect.top - tooltipRect.height - 10;
                 
-                // Fallback: If it goes off the top edge, flip to below the button
                 if (top < 10) {
                     top = rect.bottom + 10;
                 }
             } else {
-                // Normal sidebars: position to the left/right
                 top = Math.min(window.innerHeight - 20, rect.top + rect.height / 2 - 20);
                 left = rect.right + 12;
                 
@@ -1189,7 +1180,6 @@
             });
         }
 
-        // --- WHOLE ESSAY CODES LOGIC ---
         wecToggle.addEventListener('change', (e) => {
             if (e.target.checked) {
                 standardSidebars.style.display = 'none';
@@ -1411,19 +1401,16 @@
             const strongNode = document.createElement('strong');
             strongNode.textContent = `${code}`; 
             
-            // Create protective spacing around the tag 
-            const trailingSpaceNode = document.createTextNode(' ');
-            const leadingSpaceNode = document.createTextNode(' ');
+            const spaceBefore = document.createTextNode(' ');
+            const spaceAfter = document.createTextNode(' ');
 
             range.deleteContents();
-            
-            // Insert correctly so leading is before, trailing is after
-            range.insertNode(trailingSpaceNode);
+            range.insertNode(spaceAfter);
             range.insertNode(strongNode);
-            range.insertNode(leadingSpaceNode);
+            range.insertNode(spaceBefore);
 
             const newRange = document.createRange();
-            newRange.setStartAfter(trailingSpaceNode);
+            newRange.setStartAfter(spaceAfter);
             newRange.collapse(true);
             selection.removeAllRanges();
             selection.addRange(newRange);
@@ -1534,12 +1521,12 @@
                 range.setStartAfter(highlightSpan);
                 range.collapse(true);
                 
-                const leadingSpace = document.createTextNode(' ');
-                const trailingSpace = document.createTextNode(' ');
+                const spaceBefore = document.createTextNode(' ');
+                const spaceAfter = document.createTextNode(' ');
                 
-                range.insertNode(trailingSpace);
+                range.insertNode(spaceAfter);
                 range.insertNode(bracketNode);
-                range.insertNode(leadingSpace);
+                range.insertNode(spaceBefore);
 
                 const newRange = document.createRange();
                 newRange.setStart(bracketNode.childNodes[0], 1); 
@@ -1577,7 +1564,6 @@
 
         editor.addEventListener('blur', () => { cleanupEmptyBrackets(); });
 
-        // Tooltip Settings Sync
         if (tooltipToggle) {
             tooltipToggle.addEventListener('change', (e) => {
                 tooltipsEnabled = e.target.checked;
@@ -1644,6 +1630,7 @@
                                 favPopup.style.visibility = 'visible';
                             });
                         }
+                        
                         saveDraft();
                         saveHistory();
                         return; 
@@ -1669,6 +1656,11 @@
 
         removeCodeBtn.addEventListener('click', () => {
             if (activeTag) { 
+                const code = activeTag.textContent.replace(/^\[/, '').replace(/\]$/, '').trim();
+                if (classSummaryCounts[code] > 0) {
+                    classSummaryCounts[code]--;
+                    saveClassSummary();
+                }
                 activeTag.remove(); 
                 activeTag = null; 
                 removeCodeBtn.classList.remove('visible'); 
@@ -1692,7 +1684,7 @@
                 hideOverlays(); 
                 saveDraft(); 
                 saveHistory(); 
-                lastCopiedCounts = {}; // Reset tracking for next student
+                lastCopiedCounts = {}; 
                 saveLastCopied();
             }
         });
@@ -1701,7 +1693,36 @@
 
         copyBtn.addEventListener('click', async () => {
             const selectedLevel = getSelectedLevel();
-            const currentCounts = countCodesInHTML(editor.innerHTML);
+            
+            let editorClone = document.createElement('div');
+            editorClone.innerHTML = editor.innerHTML;
+
+            // Apply bulletproof inline styles to codes so they survive the copy/paste into Outlook/Gmail
+            const strongTags = Array.from(editorClone.querySelectorAll('strong'));
+            strongTags.forEach(tag => {
+                if (tag.textContent.trim() !== '[]') {
+                    const cleanText = tag.textContent.replace(/^\[/, '').replace(/\]$/, '').trim();
+                    const newSpan = document.createElement('span');
+                    newSpan.textContent = cleanText;
+                    // Brutally enforce inline styles that email clients respect
+                    newSpan.setAttribute('style', 'color: #0284c7; font-weight: bold; text-transform: uppercase;');
+                    tag.parentNode.replaceChild(newSpan, tag);
+                } else {
+                    tag.remove();
+                }
+            });
+
+            // Apply bulletproof inline styles to ad-hoc highlights
+            const highlightSpans = Array.from(editorClone.querySelectorAll('.custom-highlight'));
+            highlightSpans.forEach(span => {
+                const newSpan = document.createElement('span');
+                newSpan.innerHTML = span.innerHTML;
+                // Hard-code background styling for email clients (using both background and background-color)
+                newSpan.setAttribute('style', 'background: #bae6fd; background-color: #bae6fd; color: #0369a1; padding: 2px 4px; border-radius: 4px; font-weight: bold;');
+                span.parentNode.replaceChild(newSpan, span);
+            });
+
+            const currentCounts = countCodesInHTML(editorClone.innerHTML);
             
             selectedWECCodes.forEach(code => {
                 currentCounts[code] = (currentCounts[code] || 0) + 1;
@@ -1723,7 +1744,7 @@
                     tableRows += `
                         <tr>
                             <td width="30%" valign="top" style="padding: 10px 12px 10px 0; border-bottom: 1px solid #e2e8f0; width: 30%; word-wrap: break-word; background-color: #ffffff;">
-                                <strong style="color: #0284c7; font-size: 10.5pt; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${code}</strong>
+                                <span style="color: #0284c7; font-weight: bold; font-size: 10.5pt; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${code}</span>
                             </td>
                             <td width="70%" valign="top" style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; width: 70%; word-wrap: break-word; background-color: #ffffff;">
                                 <div style="font-size: 10.5pt; color: #1f2937; margin-bottom: 2px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${explanationText}</div>
@@ -1735,7 +1756,7 @@
 
                 summaryHTML = `
                     <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #cbd5e1; background-color: #ffffff;">
-                        <strong style="display: block; font-size: 12pt; color: #0f172a; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Feedback Summary</strong>
+                        <div style="display: block; font-weight: bold; font-size: 12pt; color: #0f172a; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Feedback Summary</div>
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; background-color: #ffffff;">
                             <tbody>
                                 ${tableRows}
@@ -1744,15 +1765,6 @@
                     </div>
                 `;
             }
-
-            let editorClone = document.createElement('div');
-            editorClone.innerHTML = editor.innerHTML;
-
-            editorClone.querySelectorAll('strong').forEach(tag => {
-                if (tag.textContent.trim() !== '[]') {
-                    tag.textContent = tag.textContent.replace(/^\[/, '').replace(/\]$/, '').trim();
-                }
-            });
 
             const finalHTML = `
                 <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11pt; color: #334155; line-height: 1.6; max-width: 100%; width: 100%; background-color: #ffffff; padding: 2px;">
@@ -1766,7 +1778,6 @@
 
             copyStaging.innerHTML = finalHTML;
 
-            // NEW: Smart Class Summary Net Tracking (Fixes inflation)
             Object.keys(currentCounts).forEach(code => {
                 const diff = currentCounts[code] - (lastCopiedCounts[code] || 0);
                 if (diff !== 0) {
@@ -1798,7 +1809,6 @@
             });
         }
 
-        // --- RESTORED: MODAL LOGIC (Summary) ---
         classSummaryBtn.addEventListener('click', () => {
             hideOverlays();
             modalBodyContent.innerHTML = getClassSummaryHTML();
@@ -1837,7 +1847,11 @@
             else showToast('Could not copy class summary.');
         });
 
-        // --- ADMIN / DEPLOY LOGIC ---
+        favoritesToggle.addEventListener('change', (e) => {
+            favoritesEnabled = e.target.checked;
+            try { localStorage.setItem(FAV_TOGGLE_PREF_KEY, JSON.stringify(favoritesEnabled)); } catch(e) {}
+        });
+
         openAdminBtn.addEventListener('click', () => {
             hideOverlays();
             adminModal.classList.add('visible');
@@ -1851,7 +1865,6 @@
             
             const rows = [headers];
             
-            // 10 Structure Rows
             rows.push(["structure", "FIX THIS FRAGMENT", "This is an incomplete sentence.", "Because I was tired. -> I slept because I was tired.", "Running through the dark forest. -> She was running through the dark.", "Although it rained. -> Although it rained, we played."]);
             rows.push(["structure", "SPLIT THIS RUN-ON", "Two or more complete sentences are joined without proper punctuation.", "", "", ""]);
             rows.push(["structure", "MIXING TENSE", "Keep your verbs in the same time period.", "", "", ""]);
@@ -1863,7 +1876,6 @@
             rows.push(["structure", "PARAGRAPH TOO LONG", "Break this paragraph into two smaller ones.", "", "", ""]);
             rows.push(["structure", "MISSING TOPIC SENTENCE", "Start the paragraph with a clear point.", "", "", ""]);
 
-            // 10 Expression Rows
             rows.push(["expression", "AWKWARD PHRASING", "This wording sounds unnatural.", "", "We used glue for making it. -> We used glue to make it.", ""]);
             rows.push(["expression", "PROOFREADING NEEDED", "Check spelling, punctuation, capitals.", "", "", ""]);
             rows.push(["expression", "SENTENCE UNCLEAR", "The meaning is difficult to follow.", "", "", ""]);
@@ -1875,7 +1887,6 @@
             rows.push(["expression", "PUNCTUATION ERROR", "Check your commas and full stops.", "", "", ""]);
             rows.push(["expression", "CAPITALISATION ERROR", "Check your capital letters.", "", "", ""]);
 
-            // 10 Whole Essay Rows
             rows.push(["whole_essay", "WEAK CONCLUSION", "The ending does not wrap up the argument effectively.", "Your ending repeats ideas but doesn’t finish strongly.", "Conclusion is repetitive and lacks impact.", "The conclusion lacks synthesis and insight."]);
             rows.push(["whole_essay", "WEAK TOPIC SENTENCES", "Paragraphs lack a clear opening point.", "", "", ""]);
             rows.push(["whole_essay", "WEAK DEVELOPMENT", "Ideas need further expansion and detail.", "", "", ""]);
