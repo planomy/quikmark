@@ -17,10 +17,6 @@
             --danger-hover: #dc2626;
             --success: #0f766e;
             --success-hover: #0d5f59;
-            --magic: #4b5563; 
-            --magic-hover: #374151; 
-            --pending-bg: #f1f5f9;
-            --pending-text: #64748b;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
@@ -118,6 +114,14 @@
             min-height: 0;
         }
 
+        /* Container for the normal two sidebars */
+        .sidebars-wrapper {
+            display: flex;
+            gap: 24px;
+            flex: 2; /* Matches editor column width ratio to take 50% of screen */
+            min-width: 0;
+        }
+
         .sidebar-column {
             flex: 1; 
             min-width: 0;
@@ -129,6 +133,64 @@
             box-shadow: var(--shadow);
             overflow: hidden;
             min-height: 0;
+        }
+
+        /* The Overlay Panel for Whole Essay Codes */
+        .wec-sidebar {
+            display: none;
+            flex: 2;
+            flex-direction: column;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            min-height: 0;
+        }
+        .wec-sidebar.visible { display: flex; }
+        
+        .wec-code-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            text-align: left;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            background: #fdfdfd;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .wec-code-btn:hover { border-color: #bae6fd; background: #f8fafc; }
+        .wec-code-btn.selected { border-color: var(--primary); background: #f0f9ff; color: var(--primary); }
+        
+        /* Custom Checkbox visual for the cards */
+        .wec-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            transition: all 0.2s;
+        }
+        .wec-code-btn.selected .wec-checkbox {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .wec-code-btn.selected .wec-checkbox::after {
+            content: "✓";
+            color: white;
+            font-size: 14px;
+            font-weight: 900;
         }
 
         .column-header {
@@ -254,13 +316,6 @@
             text-transform: uppercase;
         }
 
-        strong.selected {
-            background-color: #fecaca;
-            color: #b91c1c;
-            border-radius: 4px;
-            padding: 0 4px;
-        }
-
         /* Custom Ad-Hoc Text Highlighting */
         .custom-highlight {
             background-color: #bae6fd;
@@ -269,31 +324,6 @@
             border-radius: 4px;
             font-weight: 600;
         }
-
-        /* Pending Auto-Mark Suggestion Tag (Shrunk) */
-        .pending-tag {
-            display: inline-flex;
-            align-items: center;
-            background: var(--pending-bg);
-            color: var(--pending-text);
-            padding: 0;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 0.72rem; /* Shrunk from 0.85em */
-            margin: 0 4px;
-            vertical-align: middle;
-            overflow: hidden;
-            user-select: none;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s;
-        }
-        .pending-action { padding: 1px 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; } /* Reduced padding */
-        .pending-accept { color: var(--success); border-right: 1px solid #e2e8f0; }
-        .pending-accept:hover { background: #dcfce7; }
-        .pending-label { padding: 1px 6px; cursor: pointer; color: var(--text); } /* Reduced padding */
-        .pending-label:hover { background: #e2e8f0; }
-        .pending-reject { color: var(--danger); border-left: 1px solid #e2e8f0; }
-        .pending-reject:hover { background: #fee2e2; }
 
         .editor-footer {
             padding: 12px 16px;
@@ -352,7 +382,6 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
 
-        /* Clear Stars for Inactive */
         .star-icon {
             color: #94a3b8; 
             font-size: 1.2rem;
@@ -382,7 +411,7 @@
 
         .input-stack { display: flex; flex-direction: column; gap: 10px; }
 
-        input[type="text"] {
+        input[type="text"], input[type="file"] {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid var(--border);
@@ -394,41 +423,6 @@
             background: #fff;
         }
         input[type="text"]:focus { border-color: var(--primary); }
-
-        .auto-mark-btn {
-            background: var(--magic);
-            color: white;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-size: 1.1rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3);
-            flex-shrink: 0;
-        }
-        .auto-mark-btn.loading { animation: spin 1s linear infinite; opacity: 0.7; pointer-events: none; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .auto-mark-btn:hover { background: var(--magic-hover); transform: scale(1.1); }
-
-        .accept-all-btn {
-            background: #f5f3ff;
-            color: var(--magic);
-            border: 1.5px solid var(--magic);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-        }
-        .accept-all-btn:hover { background: var(--magic); color: white; }
 
         .action-btn {
             padding: 10px 16px;
@@ -451,6 +445,10 @@
         .action-btn.secondary { background: #e2e8f0; color: #475569; }
         .action-btn.secondary:disabled { opacity: 0.5; cursor: not-allowed; }
         .action-btn.success { background: var(--success); }
+        .action-btn.full-width { width: 100%; }
+        
+        .action-btn.admin { background: #1e293b; color: white; border: 1px solid #0f172a; }
+        .action-btn.admin:hover { background: #0f172a; }
 
         .floating-remove-btn {
             position: absolute;
@@ -472,7 +470,6 @@
             gap: 6px;
         }
 
-        /* Popup styling upgraded: position fixed + insane z-index to break container bounds */
         #favorites-popup {
             position: fixed; 
             display: none;
@@ -489,24 +486,16 @@
 
         #favorites-popup.visible { display: flex; }
 
-        #favorites-popup.visible.swapping {
-            display: grid;
-            grid-template-rows: repeat(6, auto); 
-            grid-auto-flow: column;
-            gap: 4px 12px; 
-            padding: 12px;
-        }
-
         .fav-popup-btn {
             background: transparent;
             border: none;
             text-align: left;
-            padding: 6px 10px; /* Reduced from 8px 12px */
+            padding: 6px 10px; 
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             color: var(--text);
-            font-size: 0.72rem; /* Reduced text size */
+            font-size: 0.72rem; 
             transition: background 0.15s;
             white-space: nowrap;
         }
@@ -548,7 +537,6 @@
         }
         .tooltip-header { color: var(--primary); font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; display: block; }
 
-        /* Modal fixes */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -577,24 +565,33 @@
         .modal-body { padding: 24px; overflow-y: auto; flex-grow: 1; }
         .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); background: #f8fafc; display: flex; justify-content: flex-end; gap: 12px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
 
+        .admin-section {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .admin-section h3 { margin-top: 0; margin-bottom: 12px; font-size: 1rem; color: #0f172a; }
+        .admin-step { margin-bottom: 12px; font-size: 0.9rem; color: var(--text); }
+
         .page-footer { text-align: center; font-size: 0.8rem; color: var(--text-light); padding-top: 20px; margin-top: auto; font-weight: 500; flex-shrink: 0; }
 
         @media (max-width: 1200px) {
             body { padding: 14px; overflow: auto; height: auto; min-height: 100dvh; }
             .container { flex-direction: row; flex-wrap: wrap; min-height: auto; }
             .editor-column { width: 100%; flex: 0 0 100%; margin-bottom: 10px; }
-            .sidebar-column { flex: 1; min-width: 300px; min-height: 400px; }
+            .sidebars-wrapper, .wec-sidebar { width: 100%; flex: 0 0 100%; min-height: 400px; }
         }
         @media (max-width: 768px) {
-            .sidebar-column { flex: 0 0 100%; }
+            .sidebars-wrapper { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>RAPID MARK</h1>
+        <h1 id="app-title">RAPID MARK</h1>
         <div class="header-actions">
-            <button class="action-btn secondary" id="mode-btn" title="Toggle between Analytical and Narrative marking modes">Mode: Analytical</button>
             <button class="action-btn secondary" id="evidence-mode-btn" title="Toggle evidence / source feedback codes">Evidence Mode: OFF</button>
             <div class="level-selector">
                 <input type="radio" id="lvl-primary" name="student-level" value="upper_primary">
@@ -607,6 +604,7 @@
                 <label for="lvl-upper">Upper Secondary</label>
             </div>
             <button class="action-btn success" id="class-summary-btn">Class Summary</button>
+            <button class="action-btn admin" id="open-admin-btn">⚙️ Deploy</button>
         </div>
     </div>
 
@@ -624,14 +622,19 @@
                         </div>
                     </h2>
                     <div class="header-controls">
-                        <button class="accept-all-btn" id="accept-all-btn" style="display:none;">Confirm All</button>
-                        <button class="auto-mark-btn" id="run-auto-mark-btn" data-tooltip-title="✨ Auto Mark" data-tooltip-desc="Lightning fast offline mechanical scan.">✨</button>
+                        <div class="toggle-wrapper" style="margin-right: 8px; padding-right: 14px; border-right: 1px solid var(--border);">
+                            <span style="color: var(--primary);">Whole Essay Codes</span>
+                            <label class="switch">
+                                <input type="checkbox" id="wec-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <p class="sidebar-subtext" style="visibility: hidden;">Placeholder</p>
             </div>
             <div class="editor-wrapper">
-                <div id="editor" contenteditable="true" data-placeholder="1. Paste student text here.&#10;2. Double-click or drag text to highlight it and type an inline comment.&#10;3. Single-click to select a rubric code from the Favourites menu.&#10;4. Tap ✨ to auto-scan for feedback."></div>
+                <div id="editor" contenteditable="true" data-placeholder="1. Paste student text here.&#10;2. Double-click or drag text to highlight it and type an inline comment.&#10;3. Single-click to select a rubric code from the Favourites menu."></div>
 
                 <button class="floating-remove-btn" id="remove-code-btn">Remove</button>
 
@@ -651,44 +654,71 @@
             </div>
         </div>
 
-        <div class="sidebar-column">
-            <div class="column-header">
-                <div class="title-row">
-                    <h2>STRUCTURE</h2>
-                    <div class="toggle-wrapper">
-                        <span>Tips</span>
-                        <label class="switch">
-                            <input type="checkbox" id="tooltip-toggle">
-                            <span class="slider"></span>
-                        </label>
+        <!-- WRAPPER: Normal Sidebars -->
+        <div class="sidebars-wrapper" id="standard-sidebars">
+            <div class="sidebar-column">
+                <div class="column-header">
+                    <div class="title-row">
+                        <h2>STRUCTURE</h2>
+                        <div class="toggle-wrapper">
+                            <span>Tips</span>
+                            <label class="switch">
+                                <input type="checkbox" id="tooltip-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <p class="sidebar-subtext">Sentence and paragraph construction</p>
+                </div>
+                <div id="codes-container-1" class="codes-container"></div>
+                <div class="add-code-section">
+                    <div class="input-stack">
+                        <input type="text" id="new-code-input-1" placeholder="Custom code..." autocomplete="off">
+                        <button class="action-btn full-width" id="add-code-btn-1">+ Add Structure Code</button>
                     </div>
                 </div>
-                <p class="sidebar-subtext">Sentence and paragraph construction</p>
             </div>
-            <div id="codes-container-1" class="codes-container"></div>
-            <div class="add-code-section">
-                <div class="input-stack">
-                    <input type="text" id="new-code-input-1" placeholder="Custom code..." autocomplete="off">
-                    <button class="action-btn full-width" id="add-code-btn-1">+ Add Structure Code</button>
+
+            <div class="sidebar-column">
+                <div class="column-header">
+                    <div class="title-row">
+                        <h2>EXPRESSION</h2>
+                    </div>
+                    <p class="sidebar-subtext">Clarity, wording and proofreading</p>
+                </div>
+                <div id="codes-container-2" class="codes-container"></div>
+                <div class="add-code-section">
+                    <div class="input-stack">
+                        <input type="text" id="new-code-input-2" placeholder="Custom code..." autocomplete="off">
+                        <button class="action-btn full-width" id="add-code-btn-2">+ Add Expression Code</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="sidebar-column">
+        <!-- OVERLAY: Whole Essay Codes Sidebar -->
+        <div class="wec-sidebar" id="wec-sidebar">
             <div class="column-header">
                 <div class="title-row">
-                    <h2>EXPRESSION</h2>
+                    <h2 style="color: var(--primary);">WHOLE ESSAY FEEDBACK</h2>
+                    <div class="toggle-wrapper">
+                        <span>Tips</span>
+                        <label class="switch">
+                            <input type="checkbox" id="wec-tooltip-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
-                <p class="sidebar-subtext">Clarity, wording and proofreading</p>
+                <p class="sidebar-subtext">Select overarching comments to append to the student's final report.</p>
             </div>
-            <div id="codes-container-2" class="codes-container"></div>
+            <div id="wec-codes-container" class="codes-container">
+                <!-- WEC Buttons rendered here -->
+            </div>
             <div class="add-code-section">
-                <div class="input-stack">
-                    <input type="text" id="new-code-input-2" placeholder="Custom code..." autocomplete="off">
-                    <button class="action-btn full-width" id="add-code-btn-2">+ Add Expression Code</button>
-                </div>
+                <button class="action-btn success full-width" id="wec-done-btn" style="font-size: 1rem; padding: 14px;">Save Macro Feedback & Done</button>
             </div>
         </div>
+
     </div>
 
     <div class="page-footer">
@@ -710,61 +740,106 @@
         </div>
     </div>
 
-    <!-- Moved to body level to break completely free of container clipping -->
-    <div id="favorites-popup"></div>
+    <!-- Faculty Admin Modal -->
+    <div id="admin-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Faculty Deploy: Custom Rubric</h2>
+                <button class="modal-close" id="close-admin-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="admin-section">
+                    <h3>Step 1: Download Template</h3>
+                    <p class="admin-step">Download the locked CSV template and fill it with your faculty's custom marking codes, tooltips, and student explanations.</p>
+                    <button class="action-btn secondary" id="download-template-btn">⬇️ Download CSV Template</button>
+                </div>
 
+                <div class="admin-section">
+                    <h3>Step 2: Upload & Build App</h3>
+                    <p class="admin-step">Upload your completed CSV rubric file.</p>
+                    <input type="file" id="csv-upload-input" accept=".csv" style="margin-bottom: 10px;">
+                    <div id="upload-status" style="font-size: 0.85rem; font-weight: 600; min-height: 20px; margin-bottom: 15px;"></div>
+                    
+                    <p class="admin-step">Name this specific marking tool (e.g., 'Year 9 Advertising'). This creates an isolated save environment for this task.</p>
+                    <input type="text" id="custom-app-name-input" placeholder="e.g., Year 9 English Advertising" autocomplete="off">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn admin" id="generate-app-btn" disabled>Generate Custom App</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="favorites-popup"></div>
     <div id="toast">Copied to clipboard.</div>
     <div id="copy-staging"></div>
     <div id="tooltip" class="tooltip"></div>
-
-    <!-- LINK THE SEPARATE ENGINE FILE HERE -->
-    <script src="rapid-engine.js"></script>
 
     <script>
         // ==========================================
         // UI & STATE MANAGEMENT
         // ==========================================
         let evidenceMode = false;
-        let isNarrativeMode = false;
 
+        // --- BASE_CODE_DATA_START ---
         const baseCodeData = {
-            'FIX THIS FRAGMENT': { category: 'structure', explanation: 'This is an incomplete sentence missing a main subject or verb.', examples: { upper_primary: '"Because I was tired." ➔ "I slept because I was tired."', lower_sec: '"Running through the dark forest." ➔ "She was running through the dark forest."', upper_sec: '"Although the results were largely inconclusive." ➔ "Although the results were largely inconclusive, they suggest a trend."' } },
-            'SPLIT THIS RUN-ON': { category: 'structure', explanation: 'Two or more complete sentences are joined without proper punctuation.', examples: { upper_primary: '"I like dogs they are fun." ➔ "I like dogs. They are fun."', lower_sec: '"We went to the beach it was raining we went home." ➔ "We went to the beach, but it was raining. We went home."', upper_sec: '"The experiment failed however we gathered useful data." ➔ "The experiment failed; however, we gathered useful data."' } },
-            'MIXING TENSE': { category: 'structure', explanation: 'Keep your verbs in the same time period throughout the sentence or paragraph.', examples: { upper_primary: '"I ran and jump." ➔ "I ran and jumped."', lower_sec: '"He says... and then he walked." ➔ "He said... and then he walked."', upper_sec: '"The author argues... and noted." ➔ "The author argues... and notes."' } },
-            'REPEATED IDEA': { category: 'structure', explanation: 'You have already made this point. Move to a fresh idea or combine the sentences.', examples: { upper_primary: '"I like pizza. Pizza is my favourite. I enjoy eating pizza." ➔ "Pizza is my favourite food."', lower_sec: '"The hero was courageous. He showed a lot of bravery." ➔ "The hero demonstrated immense courage."', upper_sec: '"The data is redundant. It repeats the same information." ➔ "The data is redundant."' } },
-            'EXPAND IDEA': { category: 'structure', explanation: 'Give more detail, context, or evidence so the idea is fully developed.', examples: { upper_primary: '"My weekend was fun." ➔ "My weekend was fun because I went to the zoo and saw lions."', lower_sec: '"The character felt sad." ➔ "The character felt sad, shown through his silence and withdrawal."', upper_sec: '"The treaty ended the war." ➔ "The treaty ended the war but also created harsh conditions that led to future conflict."' } },
-            'ADD MORE DEPTH': { category: 'structure', explanation: 'Go beyond summary. Analyse how or why it matters.', examples: { upper_primary: '"The plant grew." ➔ "The plant grew because it had water and sunlight."', lower_sec: '"The author uses a metaphor." ➔ "The author uses a metaphor to highlight the character’s isolation."', upper_sec: '"The protagonist is conflicted." ➔ "The protagonist’s conflict mirrors the wider social tension in the text."' } },
-            'EXPLAIN WHY': { category: 'structure', explanation: 'Support this point with a reason, evidence, or logical link.', examples: { upper_primary: '"Math is hard." ➔ "Math is hard because there are many rules to remember."', lower_sec: '"The plan failed." ➔ "The plan failed because the group did not communicate clearly."', upper_sec: '"This policy is ineffective." ➔ "This policy is ineffective because it does not address the root cause."' } },
+            'FIX THIS FRAGMENT': { category: 'structure', explanation: 'This is an incomplete sentence missing a main subject or verb.', examples: { upper_primary: 'Because I was tired. ➔ I slept because I was tired.', lower_sec: 'Running through the dark forest. ➔ She was running through the dark forest.', upper_sec: 'Although the results were largely inconclusive. ➔ Although the results were largely inconclusive, they suggest a trend.' } },
+            'SPLIT THIS RUN-ON': { category: 'structure', explanation: 'Two or more complete sentences are joined without proper punctuation.', examples: { upper_primary: 'I like dogs they are fun. ➔ I like dogs. They are fun.', lower_sec: 'We went to the beach it was raining we went home. ➔ We went to the beach, but it was raining. We went home.', upper_sec: 'The experiment failed however we gathered useful data. ➔ The experiment failed; however, we gathered useful data.' } },
+            'MIXING TENSE': { category: 'structure', explanation: 'Keep your verbs in the same time period throughout the sentence or paragraph.', examples: { upper_primary: 'I ran and jump. ➔ I ran and jumped.', lower_sec: 'He says... and then he walked. ➔ He said... and then he walked.', upper_sec: 'The author argues... and noted. ➔ The author argues... and notes.' } },
+            'REPEATED IDEA': { category: 'structure', explanation: 'You have already made this point. Move to a fresh idea or combine the sentences.', examples: { upper_primary: 'I like pizza. Pizza is my favourite. I enjoy eating pizza. ➔ Pizza is my favourite food.', lower_sec: 'The hero was courageous. He showed a lot of bravery. ➔ The hero demonstrated immense courage.', upper_sec: 'The data is redundant. It repeats the same information. ➔ The data is redundant.' } },
+            'EXPAND IDEA': { category: 'structure', explanation: 'Give more detail, context, or evidence so the idea is fully developed.', examples: { upper_primary: 'My weekend was fun. ➔ My weekend was fun because I went to the zoo and saw lions.', lower_sec: 'The character felt sad. ➔ The character felt sad, shown through his silence and withdrawal.', upper_sec: 'The treaty ended the war. ➔ The treaty ended the war but also created harsh conditions that led to future conflict.' } },
+            'ADD MORE DEPTH': { category: 'structure', explanation: 'Go beyond summary. Analyse how or why it matters.', examples: { upper_primary: 'The plant grew. ➔ The plant grew because it had water and sunlight.', lower_sec: 'The author uses a metaphor. ➔ The author uses a metaphor to highlight the character’s isolation.', upper_sec: 'The protagonist is conflicted. ➔ The protagonist’s conflict mirrors the wider social tension in the text.' } },
+            'EXPLAIN WHY': { category: 'structure', explanation: 'Support this point with a reason, evidence, or logical link.', examples: { upper_primary: 'Math is hard. ➔ Math is hard because there are many rules to remember.', lower_sec: 'The plan failed. ➔ The plan failed because the group did not communicate clearly.', upper_sec: 'This policy is ineffective. ➔ This policy is ineffective because it does not address the root cause.' } },
             'CHECK WORD COUNT': { category: 'structure', explanation: 'This section may be too brief or too long. Adjust it to suit the task.', examples: { upper_primary: 'Aim for at least 3 complete sentences.', lower_sec: 'Aim for 5–7 developed sentences in this paragraph.', upper_sec: 'Meet the length requirement without padding the response.' } },
-            'PROOFREADING NEEDED': { category: 'expression', explanation: 'Check spelling, punctuation, capitals, and small errors.', examples: { upper_primary: '"i went to the park" ➔ "I went to the park."', lower_sec: '"Their going to the store." ➔ "They’re going to the store."', upper_sec: '"The data indicates it’s effect." ➔ "The data indicates its effect."' } },
-            'AWKWARD PHRASING': { category: 'expression', explanation: 'This wording sounds unnatural or clumsy. Read it aloud and smooth it out.', examples: { upper_primary: '"The ball was throwed by him." ➔ "He threw the ball."', lower_sec: '"For the making of the project we used glue." ➔ "We used glue to make the project."', upper_sec: '"The reason for the delay was due to the fact that..." ➔ "The delay occurred because..."' } },
-            'SENTENCE UNCLEAR': { category: 'expression', explanation: 'The meaning is difficult to follow. Rewrite it more clearly.', examples: { upper_primary: '"The thing did the stuff." ➔ "The machine sorted the blocks."', lower_sec: '"He told him that he should go." ➔ "John told Mark to leave."', upper_sec: '"The overarching theme encapsulates the dichotomy." ➔ "The main theme highlights the internal conflict."' } },
-            'VAGUE STATEMENT': { category: 'expression', explanation: 'This point is too general. Add something specific.', examples: { upper_primary: '"The book was good." ➔ "The book was exciting because of the plot twists."', lower_sec: '"People think pollution is bad." ➔ "Many people argue that plastic pollution harms sea life."', upper_sec: '"Society has changed a lot." ➔ "Technology has significantly changed how people communicate."' } },
-            'TOO MANY STOP WORDS': { category: 'expression', explanation: 'Cut filler words and weak wording so the sentence sounds stronger.', examples: { upper_primary: '"It was really very big." ➔ "It was enormous."', lower_sec: '"I just think that it is basically true." ➔ "I believe it is true."', upper_sec: '"In my personal opinion, it is completely evident that..." ➔ "It is evident that..."' } },
-            'REPETITION': { category: 'expression', explanation: 'A key word or phrase is repeated too closely. Vary it or combine the ideas.', examples: { upper_primary: '"The big dog chased the big cat." ➔ "The large dog chased the big cat."', lower_sec: '"The author shows that the character is brave. This shows bravery." ➔ "The author presents the character as courageous."', upper_sec: '"The study focuses on the effects. The effects were significant." ➔ "The study focuses on the significant impacts."' } },
-            'ADD EVIDENCE': { category: 'evidence', explanation: 'Support your claim with a quotation, example, or factual detail from the text or source.', examples: { upper_primary: 'Add a sentence showing where this idea appears in the text.', lower_sec: 'Include a quote or specific detail from the text.', upper_sec: 'Integrate a relevant quotation or reference from the source.' } },
-            'EXPLAIN THE EVIDENCE': { category: 'evidence', explanation: 'Do not leave the quote alone. Explain how it proves your point.', examples: { upper_primary: 'Explain how the example proves your idea.', lower_sec: 'Show how the quote supports your argument.', upper_sec: 'Analyse the evidence and connect it to your claim.' } },
-            'LINK BACK TO QUESTION': { category: 'evidence', explanation: 'Your paragraph should clearly connect back to the essay question or argument.', examples: { upper_primary: 'Remind the reader what the question is asking.', lower_sec: 'Connect this idea clearly to the task question.', upper_sec: 'Explicitly link this analysis back to your thesis.' } },
-            'QUOTE NOT INTRODUCED': { category: 'evidence', explanation: 'Introduce the quote before using it. Tell the reader who said it or where it comes from.', examples: { upper_primary: 'Explain who said the quote.', lower_sec: 'Introduce the quote with context.', upper_sec: 'Integrate the quote grammatically into your sentence.' } }
+            'PROOFREADING NEEDED': { category: 'expression', explanation: 'Check spelling, punctuation, capitals, and small errors.', examples: { upper_primary: 'i went to the park ➔ I went to the park.', lower_sec: 'Their going to the store. ➔ They’re going to the store.', upper_sec: 'The data indicates it’s effect. ➔ The data indicates its effect.' } },
+            'AWKWARD PHRASING': { category: 'expression', explanation: 'This wording sounds unnatural or clumsy. Read it aloud and smooth it out.', examples: { upper_primary: 'The ball was throwed by him. ➔ He threw the ball.', lower_sec: 'For the making of the project we used glue. ➔ We used glue to make the project.', upper_sec: 'The reason for the delay was due to the fact that... ➔ The delay occurred because...' } },
+            'SENTENCE UNCLEAR': { category: 'expression', explanation: 'The meaning is difficult to follow. Rewrite it more clearly.', examples: { upper_primary: 'The thing did the stuff. ➔ The machine sorted the blocks.', lower_sec: 'He told him that he should go. ➔ John told Mark to leave.', upper_sec: 'The overarching theme encapsulates the dichotomy. ➔ The main theme highlights the internal conflict.' } },
+            'VAGUE STATEMENT': { category: 'expression', explanation: 'This point is too general. Add something specific.', examples: { upper_primary: 'The book was good. ➔ The book was exciting because of the plot twists.', lower_sec: 'People think pollution is bad. ➔ Many people argue that plastic pollution harms sea life.', upper_sec: 'Society has changed a lot. ➔ Technology has significantly changed how people communicate.' } },
+            'TOO MANY STOP WORDS': { category: 'expression', explanation: 'Cut filler words and weak wording so the sentence sounds stronger.', examples: { upper_primary: 'It was really very big. ➔ It was enormous.', lower_sec: 'I just think that it is basically true. ➔ I believe it is true.', upper_sec: 'In my personal opinion, it is completely evident that... ➔ It is evident that...' } },
+            
+            // New 13 Macro "Whole Essay" Codes
+            'WEAK TOPIC SENTENCES': { category: 'whole_essay', explanation: 'Paragraphs lack a clear opening point.', examples: { upper_primary: 'Your paragraph doesn’t start with a clear main idea. Make sure the first sentence tells us what the paragraph is about.', lower_sec: 'Topic sentences are unclear or weak. Each paragraph should begin with a strong controlling idea.', upper_sec: 'Topic sentences lack clarity or authority. Ensure each paragraph is anchored by a precise and purposeful claim.' } },
+            'WEAK DEVELOPMENT': { category: 'whole_essay', explanation: 'Ideas need further expansion and detail.', examples: { upper_primary: 'You have some good ideas, but you need to explain them more. Tell the reader more about your thinking.', lower_sec: 'Ideas are introduced but not fully developed. Expand your explanations to show how your evidence supports your argument.', upper_sec: 'Paragraphs lack depth of development. Extend analysis to demonstrate clear logical progression and insight.' } },
+            'POOR FLOW': { category: 'whole_essay', explanation: 'Sentences and ideas do not transition smoothly.', examples: { upper_primary: 'Your ideas feel a bit jumpy. Try to connect your sentences so they flow smoothly.', lower_sec: 'Your paragraph lacks cohesion. Use linking words and logical sequencing to improve flow.', upper_sec: 'Cohesion is inconsistent. Refine transitions and sequencing to create a controlled and fluent argument.' } },
+            'REPETITION OF IDEAS': { category: 'whole_essay', explanation: 'The same concepts are being repeated unnecessarily.', examples: { upper_primary: 'You are repeating the same idea. Try to add a new idea in each paragraph.', lower_sec: 'Similar ideas are repeated across paragraphs. Each paragraph should contribute something new.', upper_sec: 'The argument lacks progression due to repetition. Ensure each paragraph advances a distinct aspect of your contention.' } },
+            'WEAK OR MISSING EVIDENCE': { category: 'whole_essay', explanation: 'Claims need stronger supporting examples or quotes.', examples: { upper_primary: 'You need to add examples to support your ideas.', lower_sec: 'Your ideas need stronger or more specific evidence.', upper_sec: 'Claims lack sufficient or precise supporting evidence. Integrate well-selected examples to strengthen your argument.' } },
+            'POOR INTEGRATION OF EVIDENCE': { category: 'whole_essay', explanation: 'Quotes or examples are dropped in awkwardly.', examples: { upper_primary: 'Your example doesn’t fit smoothly into your sentence. Try to blend it in better.', lower_sec: 'Evidence is not well integrated. Embed quotes or examples smoothly into your writing.', upper_sec: 'Evidence is insufficiently integrated. Synthesize it seamlessly into your argument.' } },
+            'TOO MUCH EVIDENCE': { category: 'whole_essay', explanation: 'Too many quotes without enough of your own explanation.', examples: { upper_primary: 'You’ve added examples, but you need to explain them more.', lower_sec: 'Too much evidence is presented without enough explanation. Focus on explaining your examples.', upper_sec: 'Excessive evidence is used without sufficient analysis. Prioritise depth over quantity.' } },
+            'RETELLING INSTEAD OF ANALYSING': { category: 'whole_essay', explanation: 'Summarising the plot rather than examining the meaning.', examples: { upper_primary: 'You are telling what happened instead of explaining it.', lower_sec: 'Your writing focuses on retelling rather than analysing. Explain the meaning of your evidence.', upper_sec: 'The response relies on description rather than analysis. Engage with deeper meaning, implications, and authorial intent.' } },
+            'WEAK LINK TO CONTENTION': { category: 'whole_essay', explanation: 'The paragraph does not clearly connect back to the main thesis.', examples: { upper_primary: 'You need to connect your ideas back to your main point.', lower_sec: 'Your analysis doesn’t clearly link back to your contention.', upper_sec: 'Analysis lacks consistent alignment with the central argument. Strengthen links to your thesis.' } },
+            'SURFACE-LEVEL EXPLANATION': { category: 'whole_essay', explanation: 'The analysis does not dig deep enough into the why or how.', examples: { upper_primary: 'Your explanation is a bit simple. Try to explain your ideas in more detail.', lower_sec: 'Your explanation is basic. Push your thinking further.', upper_sec: 'Analysis remains surface-level. Develop more sophisticated and layered interpretations.' } },
+            'TONE ISSUES': { category: 'whole_essay', explanation: 'The language used is too casual or informal for this task.', examples: { upper_primary: 'Some parts sound too casual. Try to keep your writing more formal.', lower_sec: 'Tone is inconsistent or too informal. Maintain an appropriate academic style.', upper_sec: 'Tone lacks consistency and academic control. Refine register to suit formal analytical writing.' } },
+            'EXPRESSION LACKS PRECISION': { category: 'whole_essay', explanation: 'Word choices or phrasing are vague and unclear.', examples: { upper_primary: 'Some sentences are unclear. Try to make your ideas easier to understand.', lower_sec: 'Expression is sometimes unclear or wordy. Improve clarity and precision.', upper_sec: 'Expression lacks precision and control. Refine vocabulary and sentence structure for clarity and concision.' } },
+            'WEAK CONCLUSION': { category: 'whole_essay', explanation: 'The final paragraph does not effectively wrap up the argument.', examples: { upper_primary: 'Your ending repeats ideas but doesn’t finish strongly. Try to end with a clear final thought.', lower_sec: 'Conclusion is repetitive and lacks impact. Aim to summarise and leave a strong final impression.', upper_sec: 'The conclusion lacks synthesis and insight. Reinforce your argument while offering a purposeful final statement.' } }
         };
+        // --- BASE_CODE_DATA_END ---
 
-        const CUSTOM_STORAGE_KEY = 'annotatorCustomCodesV2';
-        const CLASS_SUMMARY_KEY = 'annotatorClassSummaryV2';
-        const EDITOR_DRAFT_KEY = 'annotatorEditorDraftV2';
-        const FAVORITES_KEY = 'annotatorFavoritesV2';
-        const TOOLTIP_PREF_KEY = 'annotatorTooltipsEnabledV2';
-        const FAV_TOGGLE_PREF_KEY = 'annotatorFavoritesToggleV2';
+        const APP_ID = document.title.replace(/[^a-zA-Z0-9]/g, '_');
+        const CUSTOM_STORAGE_KEY = 'annotatorCustomCodes_' + APP_ID;
+        const CLASS_SUMMARY_KEY = 'annotatorClassSummary_' + APP_ID;
+        const EDITOR_DRAFT_KEY = 'annotatorEditorDraft_' + APP_ID;
+        const WEC_DRAFT_KEY = 'annotatorWECDraft_' + APP_ID;
+        const FAVORITES_KEY = 'annotatorFavorites_' + APP_ID;
+        const TOOLTIP_PREF_KEY = 'annotatorTooltipsEnabled_' + APP_ID;
+        const FAV_TOGGLE_PREF_KEY = 'annotatorFavoritesToggle_' + APP_ID;
 
         let savedCustomCodes = {};
         let classSummaryCounts = {};
-        let favoriteCodes = ["AWKWARD PHRASING", "FIX THIS FRAGMENT", "EXPAND IDEA"];
+        let favoriteCodes = [];
         let tooltipsEnabled = true;
         let favoritesEnabled = true;
         let savedDraft = null;
+        let selectedWECCodes = new Set(); 
+
+        if (!localStorage.getItem(FAVORITES_KEY)) {
+            const defaultFavs = ["FIX THIS FRAGMENT", "SPLIT THIS RUN-ON", "AWKWARD PHRASING"];
+            favoriteCodes = defaultFavs.filter(c => baseCodeData[c]);
+        } else {
+            try { favoriteCodes = JSON.parse(localStorage.getItem(FAVORITES_KEY)); } catch (e) {}
+        }
 
         try { savedCustomCodes = JSON.parse(localStorage.getItem(CUSTOM_STORAGE_KEY) || '{}'); } catch (e) {}
         try { classSummaryCounts = JSON.parse(localStorage.getItem(CLASS_SUMMARY_KEY) || '{}'); } catch (e) {}
-        try { const favs = localStorage.getItem(FAVORITES_KEY); if (favs) favoriteCodes = JSON.parse(favs); } catch (e) {}
         try { const tpref = localStorage.getItem(TOOLTIP_PREF_KEY); if (tpref !== null) tooltipsEnabled = JSON.parse(tpref); } catch (e) {}
         try { const fpref = localStorage.getItem(FAV_TOGGLE_PREF_KEY); if (fpref !== null) favoritesEnabled = JSON.parse(fpref); } catch (e) {}
         try { savedDraft = localStorage.getItem(EDITOR_DRAFT_KEY); } catch (e) {}
@@ -775,17 +850,20 @@
         const editorWrapper = document.querySelector('.editor-wrapper');
         const codesContainer1 = document.getElementById('codes-container-1');
         const codesContainer2 = document.getElementById('codes-container-2');
+        const standardSidebars = document.getElementById('standard-sidebars');
+        const wecSidebar = document.getElementById('wec-sidebar');
+        const wecCodesContainer = document.getElementById('wec-codes-container');
         const toast = document.getElementById('toast');
         const summaryModal = document.getElementById('summary-modal');
         const modalBodyContent = document.getElementById('modal-body-content');
+        const adminModal = document.getElementById('admin-modal');
         const favPopup = document.getElementById('favorites-popup');
-        const acceptAllBtn = document.getElementById('accept-all-btn');
         const tooltip = document.getElementById('tooltip');
-        const magicBtn = document.getElementById('run-auto-mark-btn');
         
         const evidenceModeBtn = document.getElementById('evidence-mode-btn');
-        const modeBtn = document.getElementById('mode-btn');
         const classSummaryBtn = document.getElementById('class-summary-btn');
+        const openAdminBtn = document.getElementById('open-admin-btn');
+        const closeAdminBtn = document.getElementById('close-admin-btn');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const copyResetBtn = document.getElementById('copy-reset-btn');
         const copyOnlyBtn = document.getElementById('copy-only-btn');
@@ -795,15 +873,17 @@
         const copyBtn = document.getElementById('copy-btn');
         const addCodeBtn1 = document.getElementById('add-code-btn-1');
         const addCodeBtn2 = document.getElementById('add-code-btn-2');
+        const wecDoneBtn = document.getElementById('wec-done-btn');
         const newCodeInput1 = document.getElementById('new-code-input-1');
         const newCodeInput2 = document.getElementById('new-code-input-2');
         const copyStaging = document.getElementById('copy-staging');
         const favoritesToggle = document.getElementById('favorites-toggle');
+        const wecToggle = document.getElementById('wec-toggle');
         const tooltipToggle = document.getElementById('tooltip-toggle');
+        const wecTooltipToggle = document.getElementById('wec-tooltip-toggle');
         const wordCountDisplay = document.getElementById('word-count-display');
 
         let activeTag = null;
-        let swappingTag = null;
         let hideToastTimer = null;
         let hoverTimer = null;
         let lastHoverTarget = null;
@@ -814,7 +894,10 @@
         let typingTimer = null;
 
         favoritesToggle.checked = favoritesEnabled;
+        wecToggle.checked = false;
+        
         if (tooltipToggle) tooltipToggle.checked = tooltipsEnabled;
+        if (wecTooltipToggle) wecTooltipToggle.checked = tooltipsEnabled;
 
         const showToast = (message) => {
             toast.textContent = message;
@@ -834,6 +917,9 @@
         const saveDraft = () => { 
             try { localStorage.setItem(EDITOR_DRAFT_KEY, editor.innerHTML); } catch (e) {} 
             updateWordCount();
+        };
+        const saveWECDraft = () => {
+            try { localStorage.setItem(WEC_DRAFT_KEY, JSON.stringify(Array.from(selectedWECCodes))); } catch(e){}
         };
         const saveClassSummary = () => { try { localStorage.setItem(CLASS_SUMMARY_KEY, JSON.stringify(classSummaryCounts)); } catch (e) {} };
         const saveCustomCodes = () => {
@@ -860,7 +946,6 @@
                 historyIndex--;
                 editor.innerHTML = editorHistory[historyIndex];
                 saveDraft();
-                checkPendingCount();
                 undoBtn.disabled = historyIndex <= 0;
             }
         }
@@ -891,36 +976,40 @@
 
         const getSelectedLevel = () => document.querySelector('input[name="student-level"]:checked').value;
 
+        // Tightly controlled counting function: NO brackets
         const countCodesInHTML = (html) => {
             const temp = document.createElement('div');
             temp.innerHTML = html;
             const counts = {};
             temp.querySelectorAll('strong').forEach(tag => {
-                const code = tag.textContent.replace(/^\[/, '').replace(/\]$/, '');
-                counts[code] = (counts[code] || 0) + 1;
+                let text = tag.textContent.trim();
+                if (text === '[]') return; // Ignore completely empty brackets
+                
+                // Safely strip off legacy brackets just in case they snuck in
+                let code = text.replace(/^\[/, '').replace(/\]$/, '').trim();
+                
+                if (codeData[code]) {
+                    counts[code] = (counts[code] || 0) + 1;
+                }
             });
             return counts;
         };
 
         const orderedCounts = (counts) => Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
-        const getStudentQuickSummary = (counts) => {
-            const ordered = orderedCounts(counts);
-            if (!ordered.length) return 'Quick Summary: No feedback codes were added yet.';
-            const topThree = ordered.slice(0, 3).map(([code, count]) => `${code} (${count})`);
-            return `Quick Summary: Focus first on ${topThree.join(', ')}.`;
-        };
-
         const getClassSummaryHTML = () => {
             const ordered = orderedCounts(classSummaryCounts);
             if (!ordered.length) return '<p style="margin:0;">Class Summary: No feedback has been recorded yet.</p>';
 
             const rows = ordered.map(([code, count], index) => {
-                const category = codeData[code]?.category === 'structure' ? 'Structure' : 'Expression';
+                let categoryDisplay = 'Expression';
+                if (codeData[code]?.category === 'structure') categoryDisplay = 'Structure';
+                else if (codeData[code]?.category === 'whole_essay') categoryDisplay = 'Whole Essay';
+
                 return `<tr>
                     <td style="padding:8px 10px; border:1px solid #cbd5e1;">${index + 1}</td>
-                    <td style="padding:8px 10px; border:1px solid #cbd5e1;"><strong>[${code}]</strong></td>
-                    <td style="padding:8px 10px; border:1px solid #cbd5e1;">${category}</td>
+                    <td style="padding:8px 10px; border:1px solid #cbd5e1;"><strong>${code}</strong></td>
+                    <td style="padding:8px 10px; border:1px solid #cbd5e1;">${categoryDisplay}</td>
                     <td style="padding:8px 10px; border:1px solid #cbd5e1;">${count}</td>
                 </tr>`;
             }).join('');
@@ -943,12 +1032,9 @@
         };
 
         const hideOverlays = () => {
-            if (activeTag) { activeTag.classList.remove('selected'); activeTag = null; }
+            activeTag = null; 
             removeCodeBtn.classList.remove('visible');
-            
             favPopup.classList.remove('visible');
-            favPopup.classList.remove('swapping');
-            
             clearTimeout(favPopupTimer);
             hideTooltip();
         };
@@ -984,30 +1070,50 @@
             tooltip.innerHTML = `
                 <span class="tooltip-header">${titleText}</span>
                 <div>${descText}</div>
-                ${exampleText ? `<div style="margin-top:6px; color:#cbd5e1; font-style:italic;">Example: ${exampleText}</div>` : ''}
+                ${exampleText ? `<div style="margin-top:6px; color:#cbd5e1; font-style:italic;">Feedback: ${exampleText}</div>` : ''}
             `;
-            const rect = btn.getBoundingClientRect();
-            const tooltipWidth = 300; 
             
-            let top = Math.min(window.innerHeight - 20, rect.top + rect.height / 2 - 20);
-            let left = rect.right + 12;
+            // Make tooltip block temporarily to measure dimensions properly without showing it yet
+            tooltip.style.visibility = 'hidden';
+            tooltip.style.display = 'block';
+            
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const rect = btn.getBoundingClientRect();
+            
+            let top = 0;
+            let left = 0;
 
-            if (left + tooltipWidth > window.innerWidth) {
-                left = rect.left - tooltipWidth - 12;
+            // If it's a Whole Essay Code, position tooltip ABOVE the button
+            if (btn.classList.contains('wec-code-btn')) {
+                left = rect.left;
+                top = rect.top - tooltipRect.height - 10;
+                
+                // Fallback: If it goes off the top edge, flip to below the button
+                if (top < 10) {
+                    top = rect.bottom + 10;
+                }
+            } else {
+                // Normal sidebars: position to the left/right
+                top = Math.min(window.innerHeight - 20, rect.top + rect.height / 2 - 20);
+                left = rect.right + 12;
+                
+                if (left + tooltipRect.width > window.innerWidth) {
+                    left = rect.left - tooltipRect.width - 12;
+                }
             }
             
             left = Math.max(12, left);
 
             tooltip.style.top = `${top}px`;
             tooltip.style.left = `${left}px`;
-            tooltip.style.display = 'block';
+            tooltip.style.visibility = 'visible';
         };
 
         const attachTooltipHandlers = (btn) => {
             const startHover = () => {
                 hideTooltip();
                 lastHoverTarget = btn;
-                hoverTimer = setTimeout(() => { if (lastHoverTarget === btn) showTooltip(btn); }, 200);
+                hoverTimer = setTimeout(() => { if (lastHoverTarget === btn) showTooltip(btn); }, 500);
             };
 
             btn.addEventListener('mouseenter', startHover);
@@ -1016,8 +1122,6 @@
             btn.addEventListener('blur', hideTooltip);
             btn.addEventListener('touchstart', hideTooltip, { passive: true });
         };
-        
-        attachTooltipHandlers(magicBtn);
 
         function toggleFavorite(code, starElement) {
             const index = favoriteCodes.indexOf(code);
@@ -1032,44 +1136,80 @@
             }
             try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(favoriteCodes)); } catch (e) {}
             
-            if (favPopup.classList.contains('visible')) renderFavPopup(false);
+            if (favPopup.classList.contains('visible')) renderFavPopup();
         }
 
-        function renderFavPopup(isSwapping = false) {
+        function renderFavPopup() {
             favPopup.innerHTML = '';
             
-            if (isSwapping) {
-                favPopup.classList.add('swapping');
-            } else {
-                favPopup.classList.remove('swapping');
-            }
-
-            const list = isSwapping ? Object.keys(codeData).sort((a,b) => a.localeCompare(b)) : favoriteCodes;
-            
-            if (list.length === 0) {
+            if (favoriteCodes.length === 0) {
                 favPopup.classList.remove('visible');
                 return;
             }
             
-            list.forEach(code => {
+            favoriteCodes.forEach(code => {
                 const btn = document.createElement('button');
                 btn.className = 'fav-popup-btn';
                 btn.textContent = code;
                 btn.addEventListener('mousedown', (e) => { e.preventDefault(); });
                 btn.addEventListener('click', () => {
-                    if (isSwapping && swappingTag) {
-                        swappingTag.querySelector('.pending-label').textContent = code;
-                        acceptPendingTag(swappingTag); 
-                        swappingTag = null;
-                    } else {
-                        insertCode(code);
-                    }
+                    insertCode(code);
                     favPopup.classList.remove('visible');
-                    favPopup.classList.remove('swapping');
                 });
                 favPopup.appendChild(btn);
             });
         }
+
+        // --- WHOLE ESSAY CODES LOGIC ---
+        wecToggle.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                standardSidebars.style.display = 'none';
+                wecSidebar.classList.add('visible');
+                renderWECCodes();
+            } else {
+                standardSidebars.style.display = 'flex';
+                wecSidebar.classList.remove('visible');
+            }
+        });
+
+        function renderWECCodes() {
+            wecCodesContainer.innerHTML = '';
+            const codeKeys = Object.keys(codeData).filter(k => codeData[k].category === 'whole_essay').sort((a,b) => a.localeCompare(b));
+            
+            if (codeKeys.length === 0) {
+                wecCodesContainer.innerHTML = '<p style="color:var(--text-light); font-size:0.9rem;">No Whole Essay codes found. Add some via the Deploy menu.</p>';
+                return;
+            }
+
+            codeKeys.forEach(code => {
+                const btn = document.createElement('div');
+                btn.className = `wec-code-btn ${selectedWECCodes.has(code) ? 'selected' : ''}`;
+                btn.dataset.code = code;
+                btn.innerHTML = `<span><strong>${code}</strong></span><div class="wec-checkbox"></div>`;
+                
+                btn.addEventListener('click', () => {
+                    if (selectedWECCodes.has(code)) {
+                        selectedWECCodes.delete(code);
+                        btn.classList.remove('selected');
+                    } else {
+                        selectedWECCodes.add(code);
+                        btn.classList.add('selected');
+                    }
+                    saveWECDraft(); 
+                });
+                
+                attachTooltipHandlers(btn);
+                wecCodesContainer.appendChild(btn);
+            });
+        }
+
+        wecDoneBtn.addEventListener('click', () => {
+            if (selectedWECCodes.size > 0) {
+                showToast('Macro feedback saved for report.');
+            }
+            wecToggle.checked = false;
+            wecToggle.dispatchEvent(new Event('change'));
+        });
 
         function renderButtons() {
             codesContainer1.innerHTML = '';
@@ -1089,6 +1229,10 @@
             });
 
             codeKeys.forEach((code) => {
+                const category = codeData[code].category || 'expression';
+                if (category === 'whole_essay') return; 
+                if (category === 'evidence' && !evidenceMode) return;
+
                 const btn = document.createElement('button');
                 btn.className = 'code-btn';
                 btn.dataset.code = code;
@@ -1112,17 +1256,14 @@
 
                 if (isCustom) {
                     const delBtn = btn.querySelector('.delete-icon');
-                    
-                    delBtn.addEventListener('mouseenter', () => { hideTooltip(); });
+                    delBtn.addEventListener('mouseenter', () => hideTooltip());
                     delBtn.addEventListener('mousedown', (e) => e.preventDefault());
                     delBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         hideTooltip();
-                        
                         btn.classList.add('is-confirming');
                         btn.style.borderColor = 'var(--danger)';
                         btn.style.backgroundColor = '#fef2f2';
-                        
                         btn.innerHTML = `
                             <span style="color: var(--danger); font-size: 0.85rem; font-weight: 700;">Delete code?</span>
                             <div style="display:flex; gap: 14px; align-items: center; padding-right: 4px;">
@@ -1130,7 +1271,6 @@
                                 <span class="confirm-no" style="color: var(--text-light); font-weight: 800; cursor: pointer;">No</span>
                             </div>
                         `;
-
                         btn.querySelector('.confirm-yes').addEventListener('click', (e2) => {
                             e2.stopPropagation();
                             delete codeData[code];
@@ -1141,9 +1281,8 @@
                             }
                             saveCustomCodes();
                             renderButtons();
-                            if (favPopup.classList.contains('visible')) renderFavPopup(false);
+                            if (favPopup.classList.contains('visible')) renderFavPopup();
                         });
-
                         btn.querySelector('.confirm-no').addEventListener('click', (e2) => {
                             e2.stopPropagation();
                             renderButtons(); 
@@ -1162,9 +1301,6 @@
                 });
                 
                 attachTooltipHandlers(btn);
-
-                const category = codeData[code].category || 'expression';
-                if(category === 'evidence' && !evidenceMode) return;
                 
                 if (category === 'structure') {
                     codesContainer1.appendChild(btn);
@@ -1181,11 +1317,9 @@
             }
         }
 
-        // SWEEPER FUNCTION: Cleans up empty ad-hoc brackets when you click away
         function cleanupEmptyBrackets() {
             const strongs = editor.querySelectorAll('strong');
             let changed = false;
-            
             const selection = window.getSelection();
             const activeNode = selection.rangeCount > 0 
                 ? (selection.getRangeAt(0).startContainer.nodeType === 3 ? selection.getRangeAt(0).startContainer.parentNode : selection.getRangeAt(0).startContainer) 
@@ -1193,15 +1327,12 @@
 
             strongs.forEach(el => {
                 if (el === activeNode || el.contains(activeNode)) return; 
-                
                 let text = el.textContent;
-                
                 let newText = text.replace(/\s+\]$/, ']').toUpperCase(); 
                 if (newText !== text) {
                     el.textContent = newText;
                     changed = true;
                 }
-
                 const cleanText = el.textContent.replace(/\u00A0/g, ' ').trim();
                 if (cleanText === '[]' || cleanText === '[ ]' || cleanText === '[' || cleanText === ']') {
                     el.remove();
@@ -1213,7 +1344,7 @@
 
         function insertCode(code) {
             if (activeTag) {
-                activeTag.textContent = `[${code}]`;
+                activeTag.textContent = `${code}`; 
                 const selection = window.getSelection();
                 const range = document.createRange();
                 range.setStartAfter(activeTag);
@@ -1236,7 +1367,7 @@
 
             let parentNode = range.startContainer.nodeType === 3 ? range.startContainer.parentNode : range.startContainer;
             if (parentNode.tagName === 'STRONG' && parentNode.textContent.replace(/\u00A0/g, ' ').trim() === '[]') {
-                parentNode.textContent = `[${code}]`;
+                parentNode.textContent = `${code}`; 
                 const newRange = document.createRange();
                 newRange.setStartAfter(parentNode);
                 newRange.collapse(true);
@@ -1249,15 +1380,21 @@
             }
 
             const strongNode = document.createElement('strong');
-            strongNode.textContent = `[${code}]`;
-            const spaceNode = document.createTextNode(' ');
+            strongNode.textContent = `${code}`; 
+            
+            // Create protective spacing around the tag 
+            const trailingSpaceNode = document.createTextNode(' ');
+            const leadingSpaceNode = document.createTextNode(' ');
 
             range.deleteContents();
-            range.insertNode(spaceNode);
+            
+            // Insert correctly so leading is before, trailing is after
+            range.insertNode(trailingSpaceNode);
             range.insertNode(strongNode);
+            range.insertNode(leadingSpaceNode);
 
             const newRange = document.createRange();
-            newRange.setStartAfter(spaceNode);
+            newRange.setStartAfter(trailingSpaceNode);
             newRange.collapse(true);
             selection.removeAllRanges();
             selection.addRange(newRange);
@@ -1274,162 +1411,26 @@
                 inputEl.value = '';
                 return;
             }
-
             codeData[newCode] = {
                 category,
                 explanation: 'Teacher feedback. Review this part carefully and improve it.',
                 examples: { upper_primary: '', lower_sec: '', upper_sec: '' }
             };
-
             saveCustomCodes();
             renderButtons();
             inputEl.value = '';
             showToast(`${category === 'structure' ? 'Structure' : 'Expression'} code added.`);
         }
 
-        // --- 100% LOCAL AUTO MARK ENGINE ---
-        function runAutoMark() {
-            const text = editor.innerText.trim();
-            if (!text) { showToast('Paste some text first.'); return; }
-
-            if (typeof RapidEngine === 'undefined') {
-                showToast('Error: rapid-engine.js not found! Please ensure it is in the same folder.');
-                return;
+        document.addEventListener('mousedown', (e) => {
+            if (!e.target.closest('#favorites-popup') && e.target.tagName !== 'STRONG') {
+                favPopup.classList.remove('visible');
             }
-
-            magicBtn.classList.add('loading');
-            magicBtn.textContent = '⏳';
-
-            setTimeout(() => {
-                let newHTML = editor.innerHTML;
-                let countFound = 0;
-                const level = getSelectedLevel();
-
-                // Run the robust custom NLP engine locally
-                let flags = RapidEngine.analyze(text, level);
-
-                if (isNarrativeMode) {
-                    flags = flags.filter(f => f.code !== 'QUOTE NOT INTRODUCED' && !f.code.includes('EXPLAIN THE EVIDENCE'));
-                }
-
-                flags.forEach(flag => {
-                    let codeToApply = flag.code;
-                    if (codeToApply.includes('REPETITION')) codeToApply = 'REPETITION';
-                    if (codeToApply.includes('EXPLAIN THE EVIDENCE')) codeToApply = 'EXPLAIN THE EVIDENCE';
-                    if (codeToApply.includes('PROOFREADING')) codeToApply = 'PROOFREADING NEEDED';
-
-                    if (!codeData[codeToApply]) return;
-
-                    const marker = `<span class="pending-tag" contenteditable="false"><span class="pending-action pending-accept" title="Accept Suggestion">✓</span><span class="pending-label">${codeToApply}</span><span class="pending-action pending-reject" title="Reject Suggestion">✗</span></span>`;
-                    
-                    const escaped = flag.spanText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    const regexStr = escaped.replace(/\s+/g, '(?:\\s|&nbsp;|<[^>]+>)+');
-                    const regex = new RegExp(`(${regexStr})`, 'i');
-                    
-                    if (newHTML.match(regex)) {
-                        newHTML = newHTML.replace(regex, (match) => {
-                            let processedMatch = match;
-                            
-                            // NEW: Highlight the specific repeated words in blue
-                            if (codeToApply === 'REPETITION' && flag.evidence && flag.evidence.repeatedStems) {
-                                flag.evidence.repeatedStems.forEach(stemStr => {
-                                    if (stemStr.length >= 3) {
-                                        let parts = processedMatch.split(/(<[^>]*>)/);
-                                        for (let i = 0; i < parts.length; i++) {
-                                            if (!parts[i].startsWith('<')) {
-                                                const wordRegex = new RegExp(`\\b(${stemStr}[a-zA-Z]*)\\b`, 'gi');
-                                                parts[i] = parts[i].replace(wordRegex, '<span class="custom-highlight">$1</span>');
-                                            }
-                                        }
-                                        processedMatch = parts.join('');
-                                    }
-                                });
-                            }
-
-                            return processedMatch + ` ${marker} `;
-                        });
-                        countFound++;
-                    }
-                });
-
-                editor.innerHTML = newHTML;
-                checkPendingCount();
-
-                if (countFound > 0) {
-                    saveDraft();
-                    saveHistory();
-                    showToast(`✨ Scan Complete: Proposed ${countFound} tags.`);
-                } else {
-                    showToast('Scan Complete: No mechanical issues found.');
-                }
-
-                magicBtn.classList.remove('loading');
-                magicBtn.textContent = '✨';
-            }, 50);
-        }
-
-        // --- PENDING TAG INTERACTIONS ---
-        editor.addEventListener('click', (e) => {
-            const pendingTag = e.target.closest('.pending-tag');
-            if (!pendingTag) return;
-            if (e.target.classList.contains('pending-accept')) acceptPendingTag(pendingTag, false);
-            else if (e.target.classList.contains('pending-reject')) { pendingTag.remove(); checkPendingCount(); saveDraft(); saveHistory(); }
-            else if (e.target.classList.contains('pending-label')) openSwapMenu(pendingTag, e);
+            if (!e.target.closest('#remove-code-btn') && e.target.tagName !== 'STRONG') {
+                removeCodeBtn.classList.remove('visible');
+                if (activeTag) activeTag = null;
+            }
         });
-
-        function acceptPendingTag(el, isBatch = false) {
-            const code = el.querySelector('.pending-label').textContent;
-            const strong = document.createElement('strong');
-            strong.textContent = `[${code}]`;
-            el.replaceWith(strong);
-            classSummaryCounts[code] = (classSummaryCounts[code] || 0) + 1;
-            checkPendingCount(); saveClassSummary(); saveDraft();
-            if (!isBatch) saveHistory();
-        }
-
-        function checkPendingCount() {
-            const count = editor.querySelectorAll('.pending-tag').length;
-            acceptAllBtn.style.display = count > 0 ? 'flex' : 'none';
-        }
-
-        acceptAllBtn.addEventListener('click', () => {
-            const pending = editor.querySelectorAll('.pending-tag');
-            pending.forEach(tag => acceptPendingTag(tag, true));
-            saveHistory();
-            showToast('Suggestions accepted.');
-        });
-
-        function openSwapMenu(el, event) {
-            swappingTag = el;
-            renderFavPopup(true);
-            
-            favPopup.style.visibility = 'hidden';
-            favPopup.classList.add('visible');
-            
-            requestAnimationFrame(() => {
-                const popupRect = favPopup.getBoundingClientRect();
-                
-                let top = event.clientY + 15;
-                let left = event.clientX;
-
-                // Fixed positioning logic uses the entire viewport window
-                if (left + popupRect.width > window.innerWidth) {
-                    left = window.innerWidth - popupRect.width - 20; 
-                }
-                
-                if (top + popupRect.height > window.innerHeight) {
-                    top = event.clientY - popupRect.height - 15;
-                }
-                if (top < 10) top = 10; 
-                
-                favPopup.style.top = `${top}px`;
-                favPopup.style.left = `${Math.max(10, left)}px`; 
-                favPopup.style.visibility = 'visible';
-            });
-        }
-
-        // --- EVENT LISTENERS ---
-        magicBtn.addEventListener('click', runAutoMark);
 
         editor.addEventListener('paste', (e) => {
             e.preventDefault();
@@ -1452,22 +1453,35 @@
 
         editor.addEventListener('mouseup', (e) => {
             clearTimeout(favPopupTimer);
-
             cleanupEmptyBrackets();
-
-            if (!e.target.closest('#favorites-popup') && !e.target.closest('.pending-tag')) {
-                favPopup.classList.remove('visible');
-                favPopup.classList.remove('swapping');
-            }
+            if (!e.target.closest('#favorites-popup')) favPopup.classList.remove('visible');
             
             if (e.target.tagName === 'STRONG') { 
                 activeTag = e.target; 
-                activeTag.classList.add('selected'); 
                 const tr = activeTag.getBoundingClientRect(); 
                 const wr = editorWrapper.getBoundingClientRect(); 
                 removeCodeBtn.style.top = `${tr.top - wr.top}px`; 
                 removeCodeBtn.style.left = `${tr.left - wr.left + (tr.width / 2)}px`; 
                 removeCodeBtn.classList.add('visible'); 
+                
+                if (favoritesEnabled && favoriteCodes.length > 0) {
+                    renderFavPopup();
+                    favPopup.style.visibility = 'hidden';
+                    favPopup.classList.add('visible');
+
+                    requestAnimationFrame(() => {
+                        const popupRect = favPopup.getBoundingClientRect();
+                        let top = tr.bottom + 5; 
+                        let left = tr.left;
+                        if (left + popupRect.width > window.innerWidth) left = window.innerWidth - popupRect.width - 20;
+                        if (top + popupRect.height > window.innerHeight) top = tr.top - popupRect.height - 5;
+                        if (top < 10) top = 10;
+                        
+                        favPopup.style.top = `${top}px`;
+                        favPopup.style.left = `${Math.max(10, left)}px`;
+                        favPopup.style.visibility = 'visible';
+                    });
+                }
                 return; 
             }
             
@@ -1476,12 +1490,10 @@
             const selection = window.getSelection();
             if (!selection.rangeCount) return;
 
-            // --- AD-HOC HIGHLIGHT WORKFLOW ---
             if (!selection.isCollapsed && selection.toString().trim() !== '') {
-                if (e.target.closest('.custom-highlight') || e.target.closest('.pending-tag') || e.target.closest('strong')) return;
+                if (e.target.closest('.custom-highlight') || e.target.closest('strong')) return;
 
                 const range = selection.getRangeAt(0);
-                
                 const highlightSpan = document.createElement('span');
                 highlightSpan.className = 'custom-highlight';
                 highlightSpan.appendChild(range.extractContents());
@@ -1493,9 +1505,12 @@
                 range.setStartAfter(highlightSpan);
                 range.collapse(true);
                 
-                const spaceNode = document.createTextNode(' ');
-                range.insertNode(spaceNode);
+                const leadingSpace = document.createTextNode(' ');
+                const trailingSpace = document.createTextNode(' ');
+                
+                range.insertNode(trailingSpace);
                 range.insertNode(bracketNode);
+                range.insertNode(leadingSpace);
 
                 const newRange = document.createRange();
                 newRange.setStart(bracketNode.childNodes[0], 1); 
@@ -1508,12 +1523,10 @@
                 return; 
             }
 
-            // --- STANDARD FAVOURITES WORKFLOW ---
-            if (selection.isCollapsed && favoritesEnabled && favoriteCodes.length > 0 && !e.target.closest('.pending-tag')) {
+            if (selection.isCollapsed && favoritesEnabled && favoriteCodes.length > 0) {
                 favPopupTimer = setTimeout(() => {
                     if (editor.textContent.trim() === '') return;
-                    
-                    renderFavPopup(false);
+                    renderFavPopup();
                     favPopup.style.visibility = 'hidden';
                     favPopup.classList.add('visible');
 
@@ -1521,30 +1534,41 @@
                         const popupRect = favPopup.getBoundingClientRect();
                         let top = e.clientY + 15; 
                         let left = e.clientX;
-                        
                         if (left + popupRect.width > window.innerWidth) left = window.innerWidth - popupRect.width - 20;
-                        
-                        if (top + popupRect.height > window.innerHeight) {
-                            top = e.clientY - popupRect.height - 15;
-                        }
+                        if (top + popupRect.height > window.innerHeight) top = e.clientY - popupRect.height - 15;
                         if (top < 10) top = 10;
                         
                         favPopup.style.top = `${top}px`;
                         favPopup.style.left = `${Math.max(10, left)}px`;
                         favPopup.style.visibility = 'visible';
                     });
-                }, 200);
+                }, 50); 
             }
         });
 
-        editor.addEventListener('blur', () => {
-            cleanupEmptyBrackets(); 
-        });
+        editor.addEventListener('blur', () => { cleanupEmptyBrackets(); });
+
+        // Tooltip Settings Sync
+        if (tooltipToggle) {
+            tooltipToggle.addEventListener('change', (e) => {
+                tooltipsEnabled = e.target.checked;
+                try { localStorage.setItem(TOOLTIP_PREF_KEY, JSON.stringify(tooltipsEnabled)); } catch(e) {}
+                if (wecTooltipToggle) wecTooltipToggle.checked = tooltipsEnabled;
+                if (!tooltipsEnabled) hideTooltip();
+            });
+        }
+
+        if (wecTooltipToggle) {
+            wecTooltipToggle.addEventListener('change', (e) => {
+                tooltipsEnabled = e.target.checked;
+                try { localStorage.setItem(TOOLTIP_PREF_KEY, JSON.stringify(tooltipsEnabled)); } catch(e) {}
+                if (tooltipToggle) tooltipToggle.checked = tooltipsEnabled;
+                if (!tooltipsEnabled) hideTooltip();
+            });
+        }
 
         editor.addEventListener('input', () => {
             hideOverlays();
-            
-            // --- [[ TRIGGER LOGIC ---
             const selection = window.getSelection();
             if (selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
@@ -1572,22 +1596,18 @@
                         selection.addRange(cursorRange);
                         
                         if (favoritesEnabled && favoriteCodes.length > 0) {
-                            renderFavPopup(false);
+                            renderFavPopup();
                             favPopup.style.visibility = 'hidden';
                             favPopup.classList.add('visible');
                             
                             requestAnimationFrame(() => {
                                 const popupRect = favPopup.getBoundingClientRect();
                                 const strongRect = strongNode.getBoundingClientRect();
-                                
                                 let top = strongRect.bottom + 5;
                                 let left = strongRect.left;
                                 
                                 if (left + popupRect.width > window.innerWidth) left = window.innerWidth - popupRect.width - 20;
-                                
-                                if (top + popupRect.height > window.innerHeight) {
-                                    top = strongRect.top - popupRect.height - 5;
-                                }
+                                if (top + popupRect.height > window.innerHeight) top = strongRect.top - popupRect.height - 5;
                                 if (top < 10) top = 10;
                                 
                                 favPopup.style.top = `${top}px`;
@@ -1595,7 +1615,6 @@
                                 favPopup.style.visibility = 'visible';
                             });
                         }
-                        
                         saveDraft();
                         saveHistory();
                         return; 
@@ -1620,7 +1639,19 @@
         window.addEventListener('scroll', hideTooltip, true);
 
         removeCodeBtn.addEventListener('click', () => {
-            if (activeTag) { activeTag.remove(); activeTag = null; removeCodeBtn.classList.remove('visible'); editor.focus(); saveDraft(); saveHistory(); }
+            if (activeTag) { 
+                const code = activeTag.textContent.replace(/^\[/, '').replace(/\]$/, '').trim();
+                if (classSummaryCounts[code] > 0) {
+                    classSummaryCounts[code]--;
+                    saveClassSummary();
+                }
+                activeTag.remove(); 
+                activeTag = null; 
+                removeCodeBtn.classList.remove('visible'); 
+                editor.focus(); 
+                saveDraft(); 
+                saveHistory(); 
+            }
         });
 
         addCodeBtn1.addEventListener('click', () => addCustomCode(newCodeInput1, 'structure'));
@@ -1629,11 +1660,13 @@
         newCodeInput2.addEventListener('keypress', (e) => { if (e.key === 'Enter') addCodeBtn2.click(); });
 
         clearBtn.addEventListener('click', () => {
-            if (editor.innerHTML.trim() !== '') { 
+            if (editor.innerHTML.trim() !== '' || selectedWECCodes.size > 0) { 
                 editor.innerHTML = ''; 
+                selectedWECCodes.clear();
+                saveWECDraft();
+                if (wecToggle.checked) renderWECCodes(); 
                 hideOverlays(); 
                 saveDraft(); 
-                acceptAllBtn.style.display='none'; 
                 saveHistory(); 
             }
         });
@@ -1642,43 +1675,77 @@
 
         copyBtn.addEventListener('click', async () => {
             const selectedLevel = getSelectedLevel();
-            copyStaging.innerHTML = editor.innerHTML;
             const currentCounts = countCodesInHTML(editor.innerHTML);
+            
+            selectedWECCodes.forEach(code => {
+                currentCounts[code] = (currentCounts[code] || 0) + 1;
+            });
+
             const ordered = orderedCounts(currentCounts);
 
             let summaryHTML = '';
-            if (ordered.length) {
-                const quickSummaryText = getStudentQuickSummary(currentCounts);
-                const bulletLines = ordered.slice(0, 5).map(([code, count]) => `<li style="margin-bottom:6px;"><strong>[${code}]</strong> — ${count} time${count === 1 ? '' : 's'}</li>`).join('');
+            if (ordered.length > 0) {
+                let tableRows = '';
+                ordered.forEach(([code, count]) => {
+                    const data = codeData[code];
+                    if (!data) return;
+                    
+                    const exampleText = data.examples[selectedLevel] ? data.examples[selectedLevel].replace(/"/g, '') : '';
+                    const feedbackHTML = exampleText ? `<div style="margin-top: 4px; color: #4b5563; font-size: 10.5pt; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-style: italic;">${exampleText}</div>` : '';
+                    let explanationText = data.explanation.replace(/"/g, '');
+
+                    tableRows += `
+                        <tr>
+                            <td width="30%" valign="top" style="padding: 10px 12px 10px 0; border-bottom: 1px solid #e2e8f0; width: 30%; word-wrap: break-word; background-color: #ffffff;">
+                                <strong style="color: #0284c7; font-size: 10.5pt; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${code}</strong>
+                            </td>
+                            <td width="70%" valign="top" style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; width: 70%; word-wrap: break-word; background-color: #ffffff;">
+                                <div style="font-size: 10.5pt; color: #1f2937; margin-bottom: 2px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${explanationText}</div>
+                                ${feedbackHTML}
+                            </td>
+                        </tr>
+                    `;
+                });
+
                 summaryHTML = `
-                    <hr style="border:0; border-top:2px solid #cbd5e1; margin: 20px 0;">
-                    <h3 style="color:#0f172a; margin-bottom: 10px;">Quick Summary</h3>
-                    <p style="margin:0 0 10px 0;">${quickSummaryText}</p>
-                    <ul style="padding-left: 20px; line-height: 1.6; margin: 0 0 8px 0;">${bulletLines}</ul>
+                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #cbd5e1; background-color: #ffffff;">
+                        <strong style="display: block; font-size: 12pt; color: #0f172a; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Feedback Summary</strong>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; background-color: #ffffff;">
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
                 `;
             }
 
-            let legendHTML = '';
-            if (ordered.length) {
-                legendHTML = '<h3 style="color:#0f172a; margin: 18px 0 12px 0;">Feedback Legend & Examples</h3><ul style="padding-left: 20px; line-height: 1.6;">';
-                ordered.forEach(([code]) => {
-                    const data = codeData[code];
-                    if (!data) return;
-                    const exampleText = data.examples[selectedLevel];
-                    const exampleHTML = exampleText ? `<br><em style="color:#64748b; font-size: 0.95em;">Example: ${exampleText}</em>` : '';
-                    legendHTML += `<li style="margin-bottom: 12px;"><strong>[${code}]</strong>: ${data.explanation}${exampleHTML}</li>`;
-                });
-                legendHTML += '</ul>';
-            }
+            let editorClone = document.createElement('div');
+            editorClone.innerHTML = editor.innerHTML;
 
-            copyStaging.innerHTML += summaryHTML + legendHTML;
+            editorClone.querySelectorAll('strong').forEach(tag => {
+                if (tag.textContent.trim() !== '[]') {
+                    tag.textContent = tag.textContent.replace(/^\[/, '').replace(/\]$/, '').trim();
+                }
+            });
+
+            const finalHTML = `
+                <div style="font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11pt; color: #334155; line-height: 1.6; max-width: 100%; width: 100%; background-color: #ffffff; padding: 2px;">
+                    <div style="word-wrap: break-word; background-color: #ffffff;">
+                        ${editorClone.innerHTML}
+                    </div>
+                    <br><br>
+                    ${summaryHTML}
+                </div>
+            `;
+
+            copyStaging.innerHTML = finalHTML;
 
             ordered.forEach(([code, count]) => { classSummaryCounts[code] = (classSummaryCounts[code] || 0) + count; });
             saveClassSummary();
 
             const ok = await copyHTMLToClipboard(copyStaging.innerHTML, copyStaging.innerText);
             copyStaging.innerHTML = '';
-            showToast(ok ? (ordered.length ? 'Feedback, quick summary and legend copied.' : 'Text copied.') : 'Copy failed on this device.');
+            showToast(ok ? (ordered.length ? 'Feedback and summary copied neatly!' : 'Text copied.') : 'Copy failed on this device.');
             hideOverlays();
         });
 
@@ -1689,68 +1756,149 @@
             renderButtons();
         });
 
-        modeBtn.addEventListener('click', () => {
-            isNarrativeMode = !isNarrativeMode;
-            modeBtn.textContent = isNarrativeMode ? 'Mode: Narrative' : 'Mode: Analytical';
-            showToast(isNarrativeMode ? 'Switched to Narrative marking rules.' : 'Switched to Analytical marking rules.');
-        });
-
-        // --- MODAL LOGIC ---
-        classSummaryBtn.addEventListener('click', () => {
+        openAdminBtn.addEventListener('click', () => {
             hideOverlays();
-            modalBodyContent.innerHTML = getClassSummaryHTML();
-            summaryModal.classList.add('visible');
-            copyResetBtn.dataset.confirm = 'false';
-            copyResetBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg> Copy & Reset Count`;
+            adminModal.classList.add('visible');
         });
 
-        closeModalBtn.addEventListener('click', () => { summaryModal.classList.remove('visible'); });
-        summaryModal.addEventListener('click', (e) => { if (e.target === summaryModal) summaryModal.classList.remove('visible'); });
+        closeAdminBtn.addEventListener('click', () => { adminModal.classList.remove('visible'); });
+        adminModal.addEventListener('click', (e) => { if (e.target === adminModal) adminModal.classList.remove('visible'); });
 
-        let copyResetConfirmTimeout;
-        copyResetBtn.addEventListener('click', async () => {
-            if (copyResetBtn.dataset.confirm === 'true') {
-                const html = getClassSummaryHTML();
-                const textWrapper = document.createElement('div'); textWrapper.innerHTML = html;
-                if (await copyHTMLToClipboard(html, textWrapper.innerText)) {
-                    classSummaryCounts = {}; saveClassSummary(); showToast('Summary copied and data reset.'); summaryModal.classList.remove('visible');
-                } else showToast('Copy failed. Data not reset.');
-                copyResetBtn.dataset.confirm = 'false';
-                copyResetBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg> Copy & Reset Count`;
-            } else {
-                copyResetBtn.dataset.confirm = 'true'; copyResetBtn.textContent = 'Are you sure? Click to confirm';
-                clearTimeout(copyResetConfirmTimeout);
-                copyResetConfirmTimeout = setTimeout(() => {
-                    copyResetBtn.dataset.confirm = 'false';
-                    copyResetBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg> Copy & Reset Count`;
-                }, 3000);
+        document.getElementById('download-template-btn').addEventListener('click', () => {
+            const headers = ["Category (structure/expression/evidence/whole_essay)", "Code", "Explanation", "Upper Primary Feedback", "Lower Secondary Feedback", "Upper Secondary Feedback"];
+            const sampleRow = ["structure", "FIX THIS FRAGMENT", "This is an incomplete sentence.", "Because I was tired. -> I slept because I was tired.", "Running through the dark forest. -> She was running through the dark.", "Although it rained. -> Although it rained, we played."];
+            const sampleRow2 = ["expression", "AWKWARD PHRASING", "This wording sounds unnatural.", "", "We used glue for making it. -> We used glue to make it.", ""];
+            const sampleRow3 = ["whole_essay", "WEAK CONCLUSION", "The ending does not wrap up the argument effectively.", "Your ending repeats ideas but doesn’t finish strongly.", "Conclusion is repetitive and lacks impact.", "The conclusion lacks synthesis and insight."];
+            
+            let csvContent = [headers, sampleRow, sampleRow2, sampleRow3]
+                .map(e => e.map(item => `"${item.replace(/"/g, '""')}"`).join(","))
+                .join("\n");
+                
+            let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
+            let url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "RapidMark_Rubric_Template.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        let uploadedCSVRows = null;
+        
+        function parseCSV(str) {
+            const arr = [];
+            let quote = false;
+            let row = 0, col = 0;
+            for (let c = 0; c < str.length; c++) {
+                let cc = str[c], nc = str[c+1];
+                arr[row] = arr[row] || [];
+                arr[row][col] = arr[row][col] || '';
+                if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
+                if (cc == '"') { quote = !quote; continue; }
+                if (cc == ',' && !quote) { ++col; continue; }
+                if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+                if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+                arr[row][col] += cc;
             }
-        });
-
-        copyOnlyBtn.addEventListener('click', async () => {
-            const html = getClassSummaryHTML();
-            const textWrapper = document.createElement('div'); textWrapper.innerHTML = html;
-            if (await copyHTMLToClipboard(html, textWrapper.innerText)) { showToast('Class summary copied.'); summaryModal.classList.remove('visible'); } 
-            else showToast('Could not copy class summary.');
-        });
-
-        favoritesToggle.addEventListener('change', (e) => {
-            favoritesEnabled = e.target.checked;
-            try { localStorage.setItem(FAV_TOGGLE_PREF_KEY, JSON.stringify(favoritesEnabled)); } catch(e) {}
-        });
-
-        if (tooltipToggle) {
-            tooltipToggle.addEventListener('change', (e) => {
-                tooltipsEnabled = e.target.checked;
-                try { localStorage.setItem(TOOLTIP_PREF_KEY, JSON.stringify(tooltipsEnabled)); } catch(e) {}
-                if (!tooltipsEnabled) hideTooltip();
-            });
+            return arr;
         }
 
-        if (savedDraft) { editor.innerHTML = savedDraft; checkPendingCount(); }
-        saveHistory(); 
-        updateWordCount(); 
-        renderButtons();
+        document.getElementById('csv-upload-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const text = event.target.result;
+                uploadedCSVRows = parseCSV(text);
+                const validRows = uploadedCSVRows.length > 1 ? uploadedCSVRows.length - 1 : 0;
+                document.getElementById('upload-status').innerHTML = `<span style="color: var(--success);">✓ Loaded ${validRows} marking codes successfully.</span>`;
+                document.getElementById('generate-app-btn').disabled = false;
+            };
+            reader.readAsText(file);
+        });
+
+        document.getElementById('generate-app-btn').addEventListener('click', () => {
+            if(!uploadedCSVRows) return;
+            
+            const customAppName = document.getElementById('custom-app-name-input').value.trim() || 'RAPID MARK Custom';
+            
+            let newBaseCodeData = {};
+            for(let i = 1; i < uploadedCSVRows.length; i++) {
+                let row = uploadedCSVRows[i];
+                if(row.length < 3 || !row[1]) continue; 
+                
+                let cat = row[0].trim().toLowerCase();
+                if(!['structure', 'expression', 'evidence', 'whole_essay'].includes(cat)) cat = 'expression';
+                
+                let code = row[1].replace(/^\[/, '').replace(/\]$/, '').trim().toUpperCase();
+                let exp = row[2].trim();
+                let up = row[3] ? row[3].trim() : '';
+                let ls = row[4] ? row[4].trim() : '';
+                let us = row[5] ? row[5].trim() : '';
+                
+                newBaseCodeData[code] = {
+                    category: cat,
+                    explanation: exp,
+                    examples: { upper_primary: up, lower_sec: ls, upper_sec: us }
+                };
+            }
+
+            let clone = document.documentElement.cloneNode(true);
+            
+            clone.querySelector('#editor').innerHTML = '';
+            clone.querySelector('#word-count-display').textContent = '0 words';
+            clone.querySelector('#admin-modal').classList.remove('visible');
+            clone.querySelector('#app-title').textContent = customAppName;
+            clone.querySelector('title').textContent = customAppName;
+            clone.querySelector('#codes-container-1').innerHTML = '';
+            clone.querySelector('#codes-container-2').innerHTML = '';
+            clone.querySelector('#wec-codes-container').innerHTML = '';
+            clone.querySelector('#upload-status').innerHTML = '';
+            clone.querySelector('#csv-upload-input').value = '';
+            clone.querySelector('#custom-app-name-input').value = '';
+            clone.querySelector('#generate-app-btn').disabled = true;
+
+            let htmlString = "<!DOCTYPE html>\n" + clone.outerHTML;
+            
+            let newBlock = "const baseCodeData = " + JSON.stringify(newBaseCodeData, null, 4) + ";";
+            let regex = /\/\/ --- BASE_CODE_DATA_START ---[\s\S]*?\/\/ --- BASE_CODE_DATA_END ---/;
+            htmlString = htmlString.replace(regex, "// --- BASE_CODE_DATA_START ---\n        " + newBlock + "\n        // --- BASE_CODE_DATA_END ---");
+            
+            let blob = new Blob([htmlString], {type: 'text/html'});
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = customAppName.replace(/\s+/g, '_') + '.html';
+            a.click();
+            
+            showToast('Custom App Generated Successfully!');
+            adminModal.classList.remove('visible');
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (savedDraft) { 
+                editor.innerHTML = savedDraft; 
+                editor.querySelectorAll('strong').forEach(tag => {
+                    if (tag.textContent.trim() !== '[]') {
+                        tag.textContent = tag.textContent.replace(/^\[/, '').replace(/\]$/, '').trim();
+                    }
+                });
+            }
+            
+            try { 
+                const loadedWEC = JSON.parse(localStorage.getItem(WEC_DRAFT_KEY));
+                if (loadedWEC && Array.isArray(loadedWEC)) {
+                    selectedWECCodes = new Set(loadedWEC);
+                }
+            } catch(e) {}
+            
+            saveHistory(); 
+            updateWordCount(); 
+            renderButtons();
+        });
+
     </script>
 </body>
 </html>
