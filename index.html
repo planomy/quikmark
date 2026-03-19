@@ -69,6 +69,7 @@
 
         .level-selector {
             display: flex;
+            position: relative;
             background: #e2e8f0;
             padding: 4px;
             border-radius: 8px;
@@ -76,9 +77,21 @@
             flex-wrap: wrap;
         }
 
-        .level-selector input[type="radio"] { display: none; }
+        /* Visually hidden but still focusable/activatable – display:none can block change events */
+        .level-selector input[type="radio"] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+            opacity: 0;
+        }
 
-        .level-selector label {
+        .level-selector .level-option {
             padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
@@ -90,7 +103,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        .level-selector input[type="radio"]:checked + label {
+        .level-selector .level-option:has(input:checked) {
             background: var(--surface);
             color: var(--primary);
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -191,6 +204,61 @@
             color: white;
             font-size: 14px;
             font-weight: 900;
+        }
+        .wec-group {
+            padding: 10px 16px 6px 16px;
+        }
+        .wec-group-label {
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            color: var(--text-light);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .wec-group-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .wec-code-item { margin-bottom: 4px; }
+        .wec-teacher-feedback {
+            padding: 16px 20px 20px 20px;
+            border-top: 1px solid var(--border);
+            background: #f8fafc;
+            flex-shrink: 0;
+        }
+        .wec-teacher-feedback label {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            color: var(--text-light);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .wec-teacher-feedback textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        .wec-teacher-feedback textarea:focus { border-color: var(--primary); outline: none; }
+        .wec-explanation {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            line-height: 1.35;
+            padding: 6px 12px 10px 12px;
+            margin: -6px 0 4px 0;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 0 0 8px 8px;
+            border-top: none;
         }
 
         .column-header {
@@ -409,6 +477,22 @@
             background: #f8fafc;
         }
 
+        .add-code-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .add-code-row input { flex: 1; min-width: 0; }
+        .add-code-plus {
+            flex-shrink: 0;
+            width: 40px;
+            min-height: 40px;
+            padding: 0;
+            font-size: 1.25rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
         .input-stack { display: flex; flex-direction: column; gap: 10px; }
 
         input[type="text"], input[type="file"] {
@@ -592,15 +676,10 @@
     <div class="header">
         <h1 id="app-title">RAPID MARK</h1>
         <div class="header-actions">
-            <div class="level-selector">
-                <input type="radio" id="lvl-primary" name="student-level" value="upper_primary">
-                <label for="lvl-primary">Upper Primary</label>
-
-                <input type="radio" id="lvl-lower" name="student-level" value="lower_sec" checked>
-                <label for="lvl-lower">Lower Secondary</label>
-
-                <input type="radio" id="lvl-upper" name="student-level" value="upper_sec">
-                <label for="lvl-upper">Upper Secondary</label>
+            <div class="level-selector" id="level-selector">
+                <label class="level-option" data-level="upper_primary"><input type="radio" name="student-level" value="upper_primary">Upper Primary</label>
+                <label class="level-option" data-level="lower_sec"><input type="radio" name="student-level" value="lower_sec" checked>Lower Secondary</label>
+                <label class="level-option" data-level="upper_sec"><input type="radio" name="student-level" value="upper_sec">Upper Secondary</label>
             </div>
             <button class="action-btn success" id="class-summary-btn">Class Summary</button>
             <button class="action-btn admin" id="open-admin-btn">⚙️ CREATE</button>
@@ -659,21 +738,15 @@
                 <div class="column-header">
                     <div class="title-row">
                         <h2>STRUCTURE</h2>
-                        <div class="toggle-wrapper">
-                            <span>Tips</span>
-                            <label class="switch">
-                                <input type="checkbox" id="tooltip-toggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
+                        <button type="button" class="action-btn secondary" id="expand-btn-structure" style="font-size: 0.78rem; padding: 6px 12px;">EXPAND</button>
                     </div>
                     <p class="sidebar-subtext">Sentence and paragraph construction</p>
                 </div>
                 <div id="codes-container-1" class="codes-container"></div>
                 <div class="add-code-section">
-                    <div class="input-stack">
-                        <input type="text" id="new-code-input-1" placeholder="Custom code..." autocomplete="off">
-                        <button class="action-btn full-width" id="add-code-btn-1">+ Add Structure Code</button>
+                    <div class="add-code-row">
+                        <button type="button" class="action-btn add-code-plus" id="add-code-btn-1">+</button>
+                        <input type="text" id="new-code-input-1" placeholder="click to add custom code" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -682,21 +755,24 @@
                 <div class="column-header">
                     <div class="title-row">
                         <h2>EXPRESSION</h2>
-                        <div class="toggle-wrapper">
-                            <span>Evidence</span>
-                            <label class="switch">
-                                <input type="checkbox" id="evidence-toggle">
-                                <span class="slider"></span>
-                            </label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="toggle-wrapper">
+                                <span>Evidence</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="evidence-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <button type="button" class="action-btn secondary" id="expand-btn-expression" style="font-size: 0.78rem; padding: 6px 12px;">EXPAND</button>
                         </div>
                     </div>
                     <p class="sidebar-subtext">Clarity, wording and proofreading</p>
                 </div>
                 <div id="codes-container-2" class="codes-container"></div>
                 <div class="add-code-section">
-                    <div class="input-stack">
-                        <input type="text" id="new-code-input-2" placeholder="Custom code..." autocomplete="off">
-                        <button class="action-btn full-width" id="add-code-btn-2">+ Add Expression Code</button>
+                    <div class="add-code-row">
+                        <button type="button" class="action-btn add-code-plus" id="add-code-btn-2">+</button>
+                        <input type="text" id="new-code-input-2" placeholder="click to add custom code" autocomplete="off">
                     </div>
                 </div>
             </div>
@@ -706,22 +782,17 @@
         <div class="wec-sidebar" id="wec-sidebar">
             <div class="column-header">
                 <div class="title-row">
-                    <h2 style="color: var(--primary);">WHOLE ESSAY FEEDBACK</h2>
-                    <div class="toggle-wrapper">
-                        <span>Tips</span>
-                        <label class="switch">
-                            <input type="checkbox" id="wec-tooltip-toggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
+                    <h2 style="color: var(--primary); font-size: 0.95rem;">WHOLE ESSAY FEEDBACK</h2>
+                    <button type="button" class="action-btn secondary" id="wec-expand-btn" style="font-size: 0.78rem; padding: 6px 12px;">EXPAND</button>
                 </div>
                 <p class="sidebar-subtext">Select overarching comments to append to the student's final report.</p>
             </div>
             <div id="wec-codes-container" class="codes-container">
                 <!-- WEC Buttons rendered here -->
             </div>
-            <div class="add-code-section">
-                <button class="action-btn success full-width" id="wec-done-btn" style="font-size: 1rem; padding: 14px;">Save Macro Feedback & Done</button>
+            <div class="wec-teacher-feedback">
+                <label for="wec-teacher-feedback-input" class="wec-teacher-feedback-label">Teacher feedback</label>
+                <textarea id="wec-teacher-feedback-input" rows="3" placeholder="Add overall comments for this student..." class="wec-teacher-feedback-input"></textarea>
             </div>
         </div>
 
@@ -809,19 +880,19 @@
             'QUOTE NOT INTRODUCED': { category: 'evidence', explanation: 'Introduce the quote before using it. Tell the reader who said it or where it comes from.', examples: { upper_primary: 'Explain who said the quote.', lower_sec: 'Introduce the quote with context.', upper_sec: 'Integrate the quote grammatically into your sentence.' } },
 
             // New 13 Macro "Whole Essay" Codes
-            'WEAK TOPIC SENTENCES': { category: 'whole_essay', explanation: 'Paragraphs lack a clear opening point.', examples: { upper_primary: 'Your paragraph doesn’t start with a clear main idea. Make sure the first sentence tells us what the paragraph is about.', lower_sec: 'Topic sentences are unclear or weak. Each paragraph should begin with a strong controlling idea.', upper_sec: 'Topic sentences lack clarity or authority. Ensure each paragraph is anchored by a precise and purposeful claim.' } },
-            'WEAK DEVELOPMENT': { category: 'whole_essay', explanation: 'Ideas need further expansion and detail.', examples: { upper_primary: 'You have some good ideas, but you need to explain them more. Tell the reader more about your thinking.', lower_sec: 'Ideas are introduced but not fully developed. Expand your explanations to show how your evidence supports your argument.', upper_sec: 'Paragraphs lack depth of development. Extend analysis to demonstrate clear logical progression and insight.' } },
-            'POOR FLOW': { category: 'whole_essay', explanation: 'Sentences and ideas do not transition smoothly.', examples: { upper_primary: 'Your ideas feel a bit jumpy. Try to connect your sentences so they flow smoothly.', lower_sec: 'Your paragraph lacks cohesion. Use linking words and logical sequencing to improve flow.', upper_sec: 'Cohesion is inconsistent. Refine transitions and sequencing to create a controlled and fluent argument.' } },
-            'REPETITION OF IDEAS': { category: 'whole_essay', explanation: 'The same concepts are being repeated unnecessarily.', examples: { upper_primary: 'You are repeating the same idea. Try to add a new idea in each paragraph.', lower_sec: 'Similar ideas are repeated across paragraphs. Each paragraph should contribute something new.', upper_sec: 'The argument lacks progression due to repetition. Ensure each paragraph advances a distinct aspect of your contention.' } },
-            'WEAK OR MISSING EVIDENCE': { category: 'whole_essay', explanation: 'Claims need stronger supporting examples or quotes.', examples: { upper_primary: 'You need to add examples to support your ideas.', lower_sec: 'Your ideas need stronger or more specific evidence.', upper_sec: 'Claims lack sufficient or precise supporting evidence. Integrate well-selected examples to strengthen your argument.' } },
-            'POOR INTEGRATION OF EVIDENCE': { category: 'whole_essay', explanation: 'Quotes or examples are dropped in awkwardly.', examples: { upper_primary: 'Your example doesn’t fit smoothly into your sentence. Try to blend it in better.', lower_sec: 'Evidence is not well integrated. Embed quotes or examples smoothly into your writing.', upper_sec: 'Evidence is insufficiently integrated. Synthesize it seamlessly into your argument.' } },
-            'TOO MUCH EVIDENCE': { category: 'whole_essay', explanation: 'Too many quotes without enough of your own explanation.', examples: { upper_primary: 'You’ve added examples, but you need to explain them more.', lower_sec: 'Too much evidence is presented without enough explanation. Focus on explaining your examples.', upper_sec: 'Excessive evidence is used without sufficient analysis. Prioritise depth over quantity.' } },
-            'RETELLING INSTEAD OF ANALYSING': { category: 'whole_essay', explanation: 'Summarising the plot rather than examining the meaning.', examples: { upper_primary: 'You are telling what happened instead of explaining it.', lower_sec: 'Your writing focuses on retelling rather than analysing. Explain the meaning of your evidence.', upper_sec: 'The response relies on description rather than analysis. Engage with deeper meaning, implications, and authorial intent.' } },
-            'WEAK LINK TO CONTENTION': { category: 'whole_essay', explanation: 'The paragraph does not clearly connect back to the main thesis.', examples: { upper_primary: 'You need to connect your ideas back to your main point.', lower_sec: 'Your analysis doesn’t clearly link back to your contention.', upper_sec: 'Analysis lacks consistent alignment with the central argument. Strengthen links to your thesis.' } },
-            'SURFACE-LEVEL EXPLANATION': { category: 'whole_essay', explanation: 'The analysis does not dig deep enough into the why or how.', examples: { upper_primary: 'Your explanation is a bit simple. Try to explain your ideas in more detail.', lower_sec: 'Your explanation is basic. Push your thinking further.', upper_sec: 'Analysis remains surface-level. Develop more sophisticated and layered interpretations.' } },
-            'TONE ISSUES': { category: 'whole_essay', explanation: 'The language used is too casual or informal for this task.', examples: { upper_primary: 'Some parts sound too casual. Try to keep your writing more formal.', lower_sec: 'Tone is inconsistent or too informal. Maintain an appropriate academic style.', upper_sec: 'Tone lacks consistency and academic control. Refine register to suit formal analytical writing.' } },
-            'EXPRESSION LACKS PRECISION': { category: 'whole_essay', explanation: 'Word choices or phrasing are vague and unclear.', examples: { upper_primary: 'Some sentences are unclear. Try to make your ideas easier to understand.', lower_sec: 'Expression is sometimes unclear or wordy. Improve clarity and precision.', upper_sec: 'Expression lacks precision and control. Refine vocabulary and sentence structure for clarity and concision.' } },
-            'WEAK CONCLUSION': { category: 'whole_essay', explanation: 'The final paragraph does not effectively wrap up the argument.', examples: { upper_primary: 'Your ending repeats ideas but doesn’t finish strongly. Try to end with a clear final thought.', lower_sec: 'Conclusion is repetitive and lacks impact. Aim to summarise and leave a strong final impression.', upper_sec: 'The conclusion lacks synthesis and insight. Reinforce your argument while offering a purposeful final statement.' } }
+            'WEAK TOPIC SENTENCES': { category: 'whole_essay', section: 'body', explanation: 'Paragraphs lack a clear opening point.', examples: { upper_primary: 'Your paragraph doesn’t start with a clear main idea. Make sure the first sentence tells us what the paragraph is about.', lower_sec: 'Topic sentences are unclear or weak. Each paragraph should begin with a strong controlling idea.', upper_sec: 'Topic sentences lack clarity or authority. Ensure each paragraph is anchored by a precise and purposeful claim.' } },
+            'WEAK DEVELOPMENT': { category: 'whole_essay', section: 'body', explanation: 'Ideas need further expansion and detail.', examples: { upper_primary: 'You have some good ideas, but you need to explain them more. Tell the reader more about your thinking.', lower_sec: 'Ideas are introduced but not fully developed. Expand your explanations to show how your evidence supports your argument.', upper_sec: 'Paragraphs lack depth of development. Extend analysis to demonstrate clear logical progression and insight.' } },
+            'POOR FLOW': { category: 'whole_essay', section: 'intro', explanation: 'Sentences and ideas do not transition smoothly.', examples: { upper_primary: 'Your ideas feel a bit jumpy. Try to connect your sentences so they flow smoothly.', lower_sec: 'Your paragraph lacks cohesion. Use linking words and logical sequencing to improve flow.', upper_sec: 'Cohesion is inconsistent. Refine transitions and sequencing to create a controlled and fluent argument.' } },
+            'REPETITION OF IDEAS': { category: 'whole_essay', section: 'body', explanation: 'The same concepts are being repeated unnecessarily.', examples: { upper_primary: 'You are repeating the same idea. Try to add a new idea in each paragraph.', lower_sec: 'Similar ideas are repeated across paragraphs. Each paragraph should contribute something new.', upper_sec: 'The argument lacks progression due to repetition. Ensure each paragraph advances a distinct aspect of your contention.' } },
+            'WEAK OR MISSING EVIDENCE': { category: 'whole_essay', section: 'body', explanation: 'Claims need stronger supporting examples or quotes.', examples: { upper_primary: 'You need to add examples to support your ideas.', lower_sec: 'Your ideas need stronger or more specific evidence.', upper_sec: 'Claims lack sufficient or precise supporting evidence. Integrate well-selected examples to strengthen your argument.' } },
+            'POOR INTEGRATION OF EVIDENCE': { category: 'whole_essay', section: 'body', explanation: 'Quotes or examples are dropped in awkwardly.', examples: { upper_primary: 'Your example doesn’t fit smoothly into your sentence. Try to blend it in better.', lower_sec: 'Evidence is not well integrated. Embed quotes or examples smoothly into your writing.', upper_sec: 'Evidence is insufficiently integrated. Synthesize it seamlessly into your argument.' } },
+            'TOO MUCH EVIDENCE': { category: 'whole_essay', section: 'body', explanation: 'Too many quotes without enough of your own explanation.', examples: { upper_primary: 'You’ve added examples, but you need to explain them more.', lower_sec: 'Too much evidence is presented without enough explanation. Focus on explaining your examples.', upper_sec: 'Excessive evidence is used without sufficient analysis. Prioritise depth over quantity.' } },
+            'RETELLING INSTEAD OF ANALYSING': { category: 'whole_essay', section: 'body', explanation: 'Summarising the plot rather than examining the meaning.', examples: { upper_primary: 'You are telling what happened instead of explaining it.', lower_sec: 'Your writing focuses on retelling rather than analysing. Explain the meaning of your evidence.', upper_sec: 'The response relies on description rather than analysis. Engage with deeper meaning, implications, and authorial intent.' } },
+            'WEAK LINK TO CONTENTION': { category: 'whole_essay', section: 'body', explanation: 'The paragraph does not clearly connect back to the main thesis.', examples: { upper_primary: 'You need to connect your ideas back to your main point.', lower_sec: 'Your analysis doesn’t clearly link back to your contention.', upper_sec: 'Analysis lacks consistent alignment with the central argument. Strengthen links to your thesis.' } },
+            'SURFACE-LEVEL EXPLANATION': { category: 'whole_essay', section: 'body', explanation: 'The analysis does not dig deep enough into the why or how.', examples: { upper_primary: 'Your explanation is a bit simple. Try to explain your ideas in more detail.', lower_sec: 'Your explanation is basic. Push your thinking further.', upper_sec: 'Analysis remains surface-level. Develop more sophisticated and layered interpretations.' } },
+            'TONE ISSUES': { category: 'whole_essay', section: 'intro', explanation: 'The language used is too casual or informal for this task.', examples: { upper_primary: 'Some parts sound too casual. Try to keep your writing more formal.', lower_sec: 'Tone is inconsistent or too informal. Maintain an appropriate academic style.', upper_sec: 'Tone lacks consistency and academic control. Refine register to suit formal analytical writing.' } },
+            'EXPRESSION LACKS PRECISION': { category: 'whole_essay', section: 'intro', explanation: 'Word choices or phrasing are vague and unclear.', examples: { upper_primary: 'Some sentences are unclear. Try to make your ideas easier to understand.', lower_sec: 'Expression is sometimes unclear or wordy. Improve clarity and precision.', upper_sec: 'Expression lacks precision and control. Refine vocabulary and sentence structure for clarity and concision.' } },
+            'WEAK CONCLUSION': { category: 'whole_essay', section: 'conclusion', explanation: 'The final paragraph does not effectively wrap up the argument.', examples: { upper_primary: 'Your ending repeats ideas but doesn’t finish strongly. Try to end with a clear final thought.', lower_sec: 'Conclusion is repetitive and lacks impact. Aim to summarise and leave a strong final impression.', upper_sec: 'The conclusion lacks synthesis and insight. Reinforce your argument while offering a purposeful final statement.' } },
         };
         // --- BASE_CODE_DATA_END ---
 
@@ -830,6 +901,7 @@
         const CLASS_SUMMARY_KEY = 'annotatorClassSummaryV2_' + APP_ID;
         const EDITOR_DRAFT_KEY = 'annotatorEditorDraftV2_' + APP_ID;
         const WEC_DRAFT_KEY = 'annotatorWECDraft_' + APP_ID;
+        const WEC_TEACHER_FEEDBACK_KEY = 'annotatorWECTeacherFeedback_' + APP_ID;
         const FAVORITES_KEY = 'annotatorFavoritesV2_' + APP_ID;
         const TOOLTIP_PREF_KEY = 'annotatorTooltipsEnabledV2_' + APP_ID;
         const FAV_TOGGLE_PREF_KEY = 'annotatorFavoritesToggleV2_' + APP_ID;
@@ -873,7 +945,6 @@
         const adminModal = document.getElementById('admin-modal');
         const favPopup = document.getElementById('favorites-popup');
         const tooltip = document.getElementById('tooltip');
-        
         const evidenceToggle = document.getElementById('evidence-toggle');
         const classSummaryBtn = document.getElementById('class-summary-btn');
         const openAdminBtn = document.getElementById('open-admin-btn');
@@ -887,14 +958,16 @@
         const copyBtn = document.getElementById('copy-btn');
         const addCodeBtn1 = document.getElementById('add-code-btn-1');
         const addCodeBtn2 = document.getElementById('add-code-btn-2');
-        const wecDoneBtn = document.getElementById('wec-done-btn');
+        const wecTeacherFeedbackInput = document.getElementById('wec-teacher-feedback-input');
+        const wecExpandBtn = document.getElementById('wec-expand-btn');
         const newCodeInput1 = document.getElementById('new-code-input-1');
         const newCodeInput2 = document.getElementById('new-code-input-2');
         const copyStaging = document.getElementById('copy-staging');
         const favoritesToggle = document.getElementById('favorites-toggle');
         const wecToggle = document.getElementById('wec-toggle');
-        const tooltipToggle = document.getElementById('tooltip-toggle');
-        const wecTooltipToggle = document.getElementById('wec-tooltip-toggle');
+        const tooltipToggle = document.getElementById('tooltip-toggle'); // may be null if not in DOM
+        const expandBtnStructure = document.getElementById('expand-btn-structure');
+        const expandBtnExpression = document.getElementById('expand-btn-expression');
         const wordCountDisplay = document.getElementById('word-count-display');
 
         let activeTag = null;
@@ -906,15 +979,17 @@
         let editorHistory = [];
         let historyIndex = -1;
         let typingTimer = null;
+        let wecExpanded = false;
+        let structureExpanded = false;
+        let expressionExpanded = false;
 
-        favoritesToggle.checked = favoritesEnabled;
-        wecToggle.checked = false;
+        if (favoritesToggle) favoritesToggle.checked = favoritesEnabled;
+        if (wecToggle) wecToggle.checked = false;
         if (evidenceToggle) evidenceToggle.checked = false;
         
-        if (tooltipToggle) tooltipToggle.checked = tooltipsEnabled;
-        if (wecTooltipToggle) wecTooltipToggle.checked = tooltipsEnabled;
 
         const showToast = (message) => {
+            if (!toast) return;
             toast.textContent = message;
             toast.classList.add('show');
             clearTimeout(hideToastTimer);
@@ -922,7 +997,7 @@
         };
 
         const updateWordCount = () => {
-            if (!wordCountDisplay) return;
+            if (!wordCountDisplay || !editor) return;
             const text = editor.innerText || '';
             const cleanText = text.replace(/\[.*?\]/g, '').trim();
             const count = cleanText ? cleanText.split(/\s+/).filter(w => w.length > 0).length : 0;
@@ -930,11 +1005,16 @@
         };
 
         const saveDraft = () => { 
+            if (!editor) return;
             try { localStorage.setItem(EDITOR_DRAFT_KEY, editor.innerHTML); } catch (e) {} 
             updateWordCount();
         };
         const saveWECDraft = () => {
             try { localStorage.setItem(WEC_DRAFT_KEY, JSON.stringify(Array.from(selectedWECCodes))); } catch(e){}
+        };
+        const saveTeacherFeedback = () => {
+            const el = document.getElementById('wec-teacher-feedback-input');
+            if (el) try { localStorage.setItem(WEC_TEACHER_FEEDBACK_KEY, el.value); } catch(e){}
         };
         const saveClassSummary = () => { try { localStorage.setItem(CLASS_SUMMARY_KEY, JSON.stringify(classSummaryCounts)); } catch (e) {} };
         const saveLastCopied = () => { try { localStorage.setItem(LAST_COPIED_KEY, JSON.stringify(lastCopiedCounts)); } catch (e) {} };
@@ -945,6 +1025,7 @@
         };
 
         function saveHistory() {
+            if (!editor) return;
             const content = editor.innerHTML;
             if (historyIndex >= 0 && editorHistory[historyIndex] === content) return;
             
@@ -954,10 +1035,11 @@
             if (editorHistory.length > 50) editorHistory.shift(); 
             else historyIndex++;
             
-            undoBtn.disabled = historyIndex <= 0;
+            if (undoBtn) undoBtn.disabled = historyIndex <= 0;
         }
 
         function performUndo() {
+            if (!editor || historyIndex <= 0) return;
             if (historyIndex > 0) {
                 historyIndex--;
                 editor.innerHTML = editorHistory[historyIndex];
@@ -990,7 +1072,8 @@
             return ok;
         };
 
-        const getSelectedLevel = () => document.querySelector('input[name="student-level"]:checked').value;
+        let selectedLevel = 'lower_sec';
+        const getSelectedLevel = () => selectedLevel;
 
         const countCodesInHTML = (html) => {
             const temp = document.createElement('div');
@@ -1171,7 +1254,7 @@
                 const btn = document.createElement('button');
                 btn.className = 'fav-popup-btn';
                 btn.textContent = code;
-                btn.addEventListener('mousedown', (e) => { e.preventDefault(); });
+                btn.addEventListener('mousedown', (e) => {  });
                 btn.addEventListener('click', () => {
                     insertCode(code);
                     favPopup.classList.remove('visible');
@@ -1180,59 +1263,117 @@
             });
         }
 
-        wecToggle.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                standardSidebars.style.display = 'none';
-                wecSidebar.classList.add('visible');
-                renderWECCodes();
-            } else {
-                standardSidebars.style.display = 'flex';
-                wecSidebar.classList.remove('visible');
-            }
-        });
+        if (wecToggle) {
+            wecToggle.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    standardSidebars.style.display = 'none';
+                    wecSidebar.classList.add('visible');
+                    renderWECCodes();
+                } else {
+                    standardSidebars.style.display = 'flex';
+                    wecSidebar.classList.remove('visible');
+                }
+            });
+        }
 
-        function renderWECCodes() {
+        if (expandBtnStructure) {
+            expandBtnStructure.addEventListener('click', () => {
+                structureExpanded = !structureExpanded;
+                expandBtnStructure.textContent = structureExpanded ? 'COLLAPSE' : 'EXPAND';
+                renderButtons();
+            });
+        }
+        if (expandBtnExpression) {
+            expandBtnExpression.addEventListener('click', () => {
+                expressionExpanded = !expressionExpanded;
+                expandBtnExpression.textContent = expressionExpanded ? 'COLLAPSE' : 'EXPAND';
+                renderButtons();
+            });
+        }
+
+        // Initial render – run now (DOM should be ready: script is at end of body) and again on DOMContentLoaded
+        renderButtons();
+
+        function renderWECCodes(levelOverride) {
             wecCodesContainer.innerHTML = '';
-            const codeKeys = Object.keys(codeData).filter(k => codeData[k].category === 'whole_essay').sort((a,b) => a.localeCompare(b));
+            const lev = levelOverride !== undefined ? levelOverride : getSelectedLevel();
+            const codeKeys = Object.keys(codeData).filter(k => codeData[k].category === 'whole_essay');
             
             if (codeKeys.length === 0) {
                 wecCodesContainer.innerHTML = '<p style="color:var(--text-light); font-size:0.9rem;">No Whole Essay codes found. Add some via the Deploy menu.</p>';
                 return;
             }
 
+            const bySection = { intro: [], body: [], conclusion: [] };
             codeKeys.forEach(code => {
-                const btn = document.createElement('div');
-                btn.className = `wec-code-btn ${selectedWECCodes.has(code) ? 'selected' : ''}`;
-                btn.dataset.code = code;
-                btn.innerHTML = `<span><strong>${code}</strong></span><div class="wec-checkbox"></div>`;
-                
-                btn.addEventListener('click', () => {
-                    if (selectedWECCodes.has(code)) {
-                        selectedWECCodes.delete(code);
-                        btn.classList.remove('selected');
-                    } else {
-                        selectedWECCodes.add(code);
-                        btn.classList.add('selected');
+                const section = (codeData[code].section || 'body').toLowerCase();
+                if (bySection[section]) bySection[section].push(code);
+                else bySection.body.push(code);
+            });
+            ['intro', 'body', 'conclusion'].forEach(section => {
+                const codes = bySection[section];
+                if (!codes || codes.length === 0) return;
+                codes.sort((a, b) => a.localeCompare(b));
+                const group = document.createElement('div');
+                group.className = 'wec-group';
+                const label = document.createElement('div');
+                label.className = 'wec-group-label';
+                label.textContent = section.toUpperCase();
+                group.appendChild(label);
+                const list = document.createElement('div');
+                list.className = 'wec-group-buttons';
+                codes.forEach(code => {
+                    const item = document.createElement('div');
+                    item.className = 'wec-code-item';
+                    const btn = document.createElement('div');
+                    btn.className = `wec-code-btn ${selectedWECCodes.has(code) ? 'selected' : ''}`;
+                    btn.dataset.code = code;
+                    btn.innerHTML = `<span><strong>${code}</strong></span><div class="wec-checkbox"></div>`;
+                    btn.addEventListener('click', () => {
+                        if (selectedWECCodes.has(code)) {
+                            selectedWECCodes.delete(code);
+                            btn.classList.remove('selected');
+                        } else {
+                            selectedWECCodes.add(code);
+                            btn.classList.add('selected');
+                        }
+                        saveWECDraft();
+                    });
+                    item.appendChild(btn);
+                    if (wecExpanded) {
+                        const expl = document.createElement('div');
+                        expl.className = 'wec-explanation';
+                        const ex = (codeData[code]?.examples?.[lev] || '').trim();
+                        expl.textContent = ex ? `${(codeData[code]?.explanation || '')} Feedback: ${ex}` : (codeData[code]?.explanation || '');
+                        item.appendChild(expl);
                     }
-                    saveWECDraft(); 
+                    list.appendChild(item);
                 });
-                
-                attachTooltipHandlers(btn);
-                wecCodesContainer.appendChild(btn);
+                group.appendChild(list);
+                wecCodesContainer.appendChild(group);
             });
         }
 
-        wecDoneBtn.addEventListener('click', () => {
-            if (selectedWECCodes.size > 0) {
-                showToast('Macro feedback saved for report.');
-            }
-            wecToggle.checked = false;
-            wecToggle.dispatchEvent(new Event('change'));
-        });
+        if (wecExpandBtn) {
+            wecExpandBtn.addEventListener('click', () => {
+                wecExpanded = !wecExpanded;
+                wecExpandBtn.textContent = wecExpanded ? 'COLLAPSE' : 'EXPAND';
+                renderWECCodes();
+            });
+        }
 
-        function renderButtons() {
-            codesContainer1.innerHTML = '';
-            codesContainer2.innerHTML = '';
+        function renderButtons(levelOverride, _retries) {
+            const c1 = document.getElementById('codes-container-1');
+            const c2 = document.getElementById('codes-container-2');
+            if (!c1 || !c2) {
+                if ((_retries || 0) < 10) {
+                    requestAnimationFrame(() => renderButtons(levelOverride, (_retries || 0) + 1));
+                }
+                return;
+            }
+            c1.innerHTML = '';
+            c2.innerHTML = '';
+            const lev = levelOverride !== undefined ? levelOverride : getSelectedLevel();
 
             const codeKeys = Object.keys(codeData).sort((a, b) => {
                 const catA = codeData[a].category || 'expression';
@@ -1300,12 +1441,12 @@
                             }
                             saveCustomCodes();
                             renderButtons();
-                            if (favPopup.classList.contains('visible')) renderFavPopup();
+                                if (favPopup.classList.contains('visible')) renderFavPopup();
                         });
                         btn.querySelector('.confirm-no').addEventListener('click', (e2) => {
                             e2.stopPropagation();
                             renderButtons(); 
-                        });
+                            });
                     });
                 }
 
@@ -1319,12 +1460,21 @@
                     if (e.target !== star && !e.target.classList.contains('delete-icon')) insertCode(code);
                 });
                 
-                attachTooltipHandlers(btn);
+                const item = document.createElement('div');
+                item.className = 'wec-code-item';
+                item.appendChild(btn);
+                if ((category === 'structure' && structureExpanded) || (category === 'expression' && expressionExpanded)) {
+                    const expl = document.createElement('div');
+                    expl.className = 'wec-explanation';
+                    const ex = (codeData[code]?.examples?.[lev] || '').trim();
+                    expl.textContent = ex ? `${(codeData[code]?.explanation || '')} Feedback: ${ex}` : (codeData[code]?.explanation || '');
+                    item.appendChild(expl);
+                }
                 
                 if (category === 'structure') {
-                    codesContainer1.appendChild(btn);
+                    c1.appendChild(item);
                 } else {
-                    codesContainer2.appendChild(btn);
+                    c2.appendChild(item);
                 }
             });
 
@@ -1332,9 +1482,10 @@
                 const evidenceHint = document.createElement('div');
                 evidenceHint.style.cssText = 'margin: 2px 0 10px 0; padding: 8px 10px; border: 1px dashed #bae6fd; border-radius: 8px; background: #f0f9ff; color: #0369a1; font-size: 0.8rem; font-weight: 600;';
                 evidenceHint.textContent = 'Evidence codes are showing below.';
-                codesContainer2.prepend(evidenceHint);
+                c2.prepend(evidenceHint);
             }
         }
+
 
         function cleanupEmptyBrackets() {
             const strongs = editor.querySelectorAll('strong');
@@ -1449,7 +1600,7 @@
         });
 
         editor.addEventListener('paste', (e) => {
-            e.preventDefault();
+            
             const text = (e.clipboardData || window.clipboardData).getData('text/plain');
             if (document.queryCommandSupported && document.queryCommandSupported('insertText')) {
                 document.execCommand('insertText', false, text);
@@ -1568,16 +1719,6 @@
             tooltipToggle.addEventListener('change', (e) => {
                 tooltipsEnabled = e.target.checked;
                 try { localStorage.setItem(TOOLTIP_PREF_KEY, JSON.stringify(tooltipsEnabled)); } catch(e) {}
-                if (wecTooltipToggle) wecTooltipToggle.checked = tooltipsEnabled;
-                if (!tooltipsEnabled) hideTooltip();
-            });
-        }
-
-        if (wecTooltipToggle) {
-            wecTooltipToggle.addEventListener('change', (e) => {
-                tooltipsEnabled = e.target.checked;
-                try { localStorage.setItem(TOOLTIP_PREF_KEY, JSON.stringify(tooltipsEnabled)); } catch(e) {}
-                if (tooltipToggle) tooltipToggle.checked = tooltipsEnabled;
                 if (!tooltipsEnabled) hideTooltip();
             });
         }
@@ -1645,7 +1786,7 @@
 
         editor.addEventListener('keydown', (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-                e.preventDefault();
+                
                 performUndo();
             }
         });
@@ -1680,7 +1821,7 @@
                 editor.innerHTML = ''; 
                 selectedWECCodes.clear();
                 saveWECDraft();
-                if (wecToggle.checked) renderWECCodes(); 
+                if (wecToggle?.checked) renderWECCodes(); 
                 hideOverlays(); 
                 saveDraft(); 
                 saveHistory(); 
@@ -1696,6 +1837,12 @@
             
             let editorClone = document.createElement('div');
             editorClone.innerHTML = editor.innerHTML;
+
+            // Count codes BEFORE replacing strong tags (countCodesInHTML looks for strong elements)
+            const currentCounts = countCodesInHTML(editorClone.innerHTML);
+            selectedWECCodes.forEach(code => {
+                currentCounts[code] = (currentCounts[code] || 0) + 1;
+            });
 
             // Apply bulletproof inline styles to codes so they survive the copy/paste into Outlook/Gmail
             const strongTags = Array.from(editorClone.querySelectorAll('strong'));
@@ -1722,46 +1869,37 @@
                 span.parentNode.replaceChild(newSpan, span);
             });
 
-            const currentCounts = countCodesInHTML(editorClone.innerHTML);
-            
-            selectedWECCodes.forEach(code => {
-                currentCounts[code] = (currentCounts[code] || 0) + 1;
-            });
-
             const ordered = orderedCounts(currentCounts);
 
             let summaryHTML = '';
             if (ordered.length > 0) {
-                let tableRows = '';
+                const byCategory = { whole_essay: [], structure: [], expression: [], evidence: [] };
                 ordered.forEach(([code, count]) => {
-                    const data = codeData[code];
-                    if (!data) return;
-                    
-                    const exampleText = data.examples[selectedLevel] ? data.examples[selectedLevel].replace(/"/g, '') : '';
-                    const feedbackHTML = exampleText ? `<div style="margin-top: 4px; color: #4b5563; font-size: 10.5pt; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-style: italic;">${exampleText}</div>` : '';
-                    let explanationText = data.explanation.replace(/"/g, '');
-
-                    tableRows += `
-                        <tr>
-                            <td width="30%" valign="top" style="padding: 10px 12px 10px 0; border-bottom: 1px solid #e2e8f0; width: 30%; word-wrap: break-word; background-color: #ffffff;">
-                                <span style="color: #0284c7; font-weight: bold; font-size: 10.5pt; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${code}</span>
-                            </td>
-                            <td width="70%" valign="top" style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; width: 70%; word-wrap: break-word; background-color: #ffffff;">
-                                <div style="font-size: 10.5pt; color: #1f2937; margin-bottom: 2px; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">${explanationText}</div>
-                                ${feedbackHTML}
-                            </td>
-                        </tr>
-                    `;
+                    const cat = codeData[code]?.category || 'expression';
+                    if (byCategory[cat]) byCategory[cat].push([code, count]);
+                    else byCategory.expression.push([code, count]);
+                });
+                const catOrder = ['whole_essay', 'structure', 'expression', 'evidence'];
+                const catLabels = { whole_essay: 'Whole Essay', structure: 'Structure', expression: 'Expression', evidence: 'Evidence' };
+                let sections = '';
+                catOrder.forEach(cat => {
+                    const items = byCategory[cat];
+                    if (!items.length) return;
+                    const rows = items.map(([code, count]) => {
+                        const data = codeData[code];
+                        if (!data) return '';
+                        const ex = (data.examples?.[selectedLevel] || '').replace(/"/g, '');
+                        const feedbackHTML = ex ? `<div style="margin-top:2px;color:#4b5563;font-size:10pt;font-style:italic;">${ex}</div>` : '';
+                        const exp = (data.explanation || '').replace(/"/g, '');
+                        return `<tr><td width="28%" valign="top" style="padding:4px 10px 4px 0;border-bottom:1px solid #e2e8f0;"><span style="color:#0284c7;font-weight:bold;font-size:10pt;">${code}</span></td><td width="72%" valign="top" style="padding:4px 0;border-bottom:1px solid #e2e8f0;"><div style="font-size:10pt;color:#1f2937;">${exp}</div>${feedbackHTML}</td></tr>`;
+                    }).filter(Boolean).join('');
+                    sections += `<div style="margin-top:12px;"><div style="font-weight:700;font-size:9.5pt;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">${catLabels[cat]}</div><table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse:collapse;"><tbody>${rows}</tbody></table></div>`;
                 });
 
                 summaryHTML = `
-                    <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #cbd5e1; background-color: #ffffff;">
-                        <div style="display: block; font-weight: bold; font-size: 12pt; color: #0f172a; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">Feedback Summary</div>
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="width: 100%; border-collapse: collapse; text-align: left; table-layout: fixed; background-color: #ffffff;">
-                            <tbody>
-                                ${tableRows}
-                            </tbody>
-                        </table>
+                    <div style="margin-top:32px;padding-top:16px;border-top:2px solid #cbd5e1;">
+                        <div style="font-weight:700;font-size:11pt;color:#0f172a;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Feedback Summary</div>
+                        ${sections}
                     </div>
                 `;
             }
@@ -2076,6 +2214,19 @@
             saveHistory(); 
             updateWordCount(); 
             renderButtons();
+            requestAnimationFrame(() => renderButtons());
+            document.querySelectorAll('.level-selector .level-option').forEach((label) => {
+                const val = label.dataset.level;
+                if (!val) return;
+                const radio = label.querySelector('input[name="student-level"]');
+                label.addEventListener('click', () => {
+                    selectedLevel = val;
+                    if (radio) radio.checked = true;
+                    renderButtons(val);
+                    if (wecToggle && wecToggle.checked) renderWECCodes(val);
+                    showToast(`Level: ${val.replace(/_/g, ' ')}`);
+                });
+            });
         });
 
     </script>
