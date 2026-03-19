@@ -354,13 +354,22 @@
             padding: 24px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-size: 1.05rem;
             line-height: 1.8;
+            color: var(--text);
             outline: none;
             white-space: pre-wrap;
             word-wrap: break-word;
             border-top-left-radius: 11px; 
             border-top-right-radius: 11px;
+        }
+        /* Strip weird fonts/sizes from any rich paste that slips through */
+        #editor *:not(strong):not(.custom-highlight) {
+            font-family: inherit !important;
+            font-size: inherit !important;
+            line-height: inherit !important;
+            color: inherit !important;
         }
 
         #editor:focus { box-shadow: inset 0 0 0 2px var(--primary); }
@@ -1600,8 +1609,19 @@
         });
 
         editor.addEventListener('paste', (e) => {
-            
-            const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            e.preventDefault();
+            const cd = e.clipboardData || window.clipboardData;
+            if (!cd) return;
+            let text = cd.getData('text/plain') || '';
+            if (!text.trim()) {
+                const html = cd.getData('text/html');
+                if (html) {
+                    const tmp = document.createElement('div');
+                    tmp.innerHTML = html;
+                    text = tmp.innerText || tmp.textContent || '';
+                }
+            }
+            text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
             if (document.queryCommandSupported && document.queryCommandSupported('insertText')) {
                 document.execCommand('insertText', false, text);
             } else {
