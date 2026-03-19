@@ -826,13 +826,13 @@
         // --- BASE_CODE_DATA_END ---
 
         const APP_ID = document.title.replace(/[^a-zA-Z0-9]/g, '_');
-        const CUSTOM_STORAGE_KEY = 'annotatorCustomCodesV2';
-        const CLASS_SUMMARY_KEY = 'annotatorClassSummaryV2';
-        const EDITOR_DRAFT_KEY = 'annotatorEditorDraftV2';
+        const CUSTOM_STORAGE_KEY = 'annotatorCustomCodesV2_' + APP_ID;
+        const CLASS_SUMMARY_KEY = 'annotatorClassSummaryV2_' + APP_ID;
+        const EDITOR_DRAFT_KEY = 'annotatorEditorDraftV2_' + APP_ID;
         const WEC_DRAFT_KEY = 'annotatorWECDraft_' + APP_ID;
-        const FAVORITES_KEY = 'annotatorFavoritesV2';
-        const TOOLTIP_PREF_KEY = 'annotatorTooltipsEnabledV2';
-        const FAV_TOGGLE_PREF_KEY = 'annotatorFavoritesToggleV2';
+        const FAVORITES_KEY = 'annotatorFavoritesV2_' + APP_ID;
+        const TOOLTIP_PREF_KEY = 'annotatorTooltipsEnabledV2_' + APP_ID;
+        const FAV_TOGGLE_PREF_KEY = 'annotatorFavoritesToggleV2_' + APP_ID;
         const LAST_COPIED_KEY = 'annotatorLastCopied_' + APP_ID; 
 
         let savedCustomCodes = {};
@@ -1861,7 +1861,7 @@
         adminModal.addEventListener('click', (e) => { if (e.target === adminModal) adminModal.classList.remove('visible'); });
 
         document.getElementById('download-template-btn').addEventListener('click', () => {
-            const headers = ["Category (structure/expression/whole_essay)", "Code", "Explanation", "Upper Primary Feedback", "Lower Secondary Feedback", "Upper Secondary Feedback"];
+            const headers = ["Category (structure/expression/evidence/whole_essay)", "Code", "Explanation", "Upper Primary Feedback", "Lower Secondary Feedback", "Upper Secondary Feedback"];
             
             const rows = [headers];
             
@@ -1886,6 +1886,11 @@
             rows.push(["expression", "SPELLING ERROR", "Check your spelling.", "", "", ""]);
             rows.push(["expression", "PUNCTUATION ERROR", "Check your commas and full stops.", "", "", ""]);
             rows.push(["expression", "CAPITALISATION ERROR", "Check your capital letters.", "", "", ""]);
+
+            rows.push(["evidence", "ADD EVIDENCE", "Support your claim with a quotation, example, or factual detail.", "Add a sentence showing where this idea appears in the text.", "Include a quote or specific detail from the text.", "Integrate a relevant quotation."]);
+            rows.push(["evidence", "EXPLAIN THE EVIDENCE", "Do not leave the quote alone. Explain how it proves your point.", "Explain how the example proves your idea.", "Show how the quote supports your argument.", "Analyse the evidence and connect it."]);
+            rows.push(["evidence", "LINK BACK TO QUESTION", "Your paragraph should clearly connect back to the essay question or argument.", "Remind the reader what the question is asking.", "Connect this idea clearly to the task question.", "Explicitly link this analysis back to your thesis."]);
+            rows.push(["evidence", "QUOTE NOT INTRODUCED", "Introduce the quote before using it.", "Explain who said the quote.", "Introduce the quote with context.", "Integrate the quote grammatically into your sentence."]);
 
             rows.push(["whole_essay", "WEAK CONCLUSION", "The ending does not wrap up the argument effectively.", "Your ending repeats ideas but doesn’t finish strongly.", "Conclusion is repetitive and lacks impact.", "The conclusion lacks synthesis and insight."]);
             rows.push(["whole_essay", "WEAK TOPIC SENTENCES", "Paragraphs lack a clear opening point.", "", "", ""]);
@@ -1929,19 +1934,43 @@
                 if (cc == '\r' && !quote) { ++row; col = 0; continue; }
                 arr[row][col] += cc;
             }
-            return arr;
+            // Filter out empty rows to prevent parsing errors
+            return arr.filter(r => r.join('').trim() !== '');
         }
 
         document.getElementById('csv-upload-input').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if(!file) return;
+            if(!file) return; // FIX: Guard against cancelling file dialog
             const reader = new FileReader();
             reader.onload = function(event) {
                 const text = event.target.result;
                 uploadedCSVRows = parseCSV(text);
-                const validRows = uploadedCSVRows.length > 1 ? uploadedCSVRows.length - 1 : 0;
-                document.getElementById('upload-status').innerHTML = `<span style="color: var(--success);">✓ Loaded ${validRows} marking codes successfully.</span>`;
-                document.getElementById('generate-app-btn').disabled = false;
+                
+                const uniqueCodes = new Set();
+                let duplicates = 0;
+                let validCount = 0;
+
+                for(let i = 1; i < uploadedCSVRows.length; i++) {
+                    let row = uploadedCSVRows[i];
+                    if(row.length < 2 || !row[1]) continue; 
+                    let code = String(row[1] || '').replace(/^\[/, '').replace(/\]$/, '').trim().toUpperCase();
+                    if (!code) continue;
+                    
+                    if (uniqueCodes.has(code)) {
+                        duplicates++;
+                    } else {
+                        uniqueCodes.add(code);
+                        validCount++;
+                    }
+                }
+                
+                let statusHtml = `<span style="color: var(--success);">✓ Loaded ${validCount} unique marking codes.</span>`;
+                if (duplicates > 0) {
+                    statusHtml += `<br><span style="color: var(--danger); font-size: 0.8rem; margin-top:4px; display:block;">⚠️ Warning: Ignored ${duplicates} duplicate codes (Codes must be unique).</span>`;
+                }
+
+                document.getElementById('upload-status').innerHTML = statusHtml;
+                document.getElementById('generate-app-btn').disabled = validCount === 0;
             };
             reader.readAsText(file);
         });
@@ -1954,16 +1983,20 @@
             let newBaseCodeData = {};
             for(let i = 1; i < uploadedCSVRows.length; i++) {
                 let row = uploadedCSVRows[i];
-                if(row.length < 3 || !row[1]) continue; 
+                if(row.length < 2 || !row[1]) continue; 
                 
-                let cat = row[0].trim().toLowerCase();
+                let cat = (row[0] || '').trim().toLowerCase();
+                if(cat === 'whole_ess' || cat === 'macro' || cat === 'essay') cat = 'whole_essay';
                 if(!['structure', 'expression', 'evidence', 'whole_essay'].includes(cat)) cat = 'expression';
                 
-                let code = row[1].replace(/^\[/, '').replace(/\]$/, '').trim().toUpperCase();
-                let exp = row[2].trim();
-                let up = row[3] ? row[3].trim() : '';
-                let ls = row[4] ? row[4].trim() : '';
-                let us = row[5] ? row[5].trim() : '';
+                let code = String(row[1] || '').replace(/^\[/, '').replace(/\]$/, '').trim().toUpperCase();
+                if (!code) continue;
+
+                // FIX: Fallbacks guard against unexpectedly short CSV rows
+                let exp = String(row[2] || '').trim();
+                let up = String(row[3] || '').trim();
+                let ls = String(row[4] || '').trim();
+                let us = String(row[5] || '').trim();
                 
                 newBaseCodeData[code] = {
                     category: cat,
@@ -1989,15 +2022,34 @@
 
             let htmlString = "<!DOCTYPE html>\n" + clone.outerHTML;
             
-            let newBlock = "const baseCodeData = " + JSON.stringify(newBaseCodeData, null, 4) + ";";
-            let regex = /\/\/ --- BASE_CODE_DATA_START ---[\s\S]*?\/\/ --- BASE_CODE_DATA_END ---/;
-            htmlString = htmlString.replace(regex, "// --- BASE_CODE_DATA_START ---\n        " + newBlock + "\n        // --- BASE_CODE_DATA_END ---");
+            // FIX: Escape script tags so JSON doesn't accidentally terminate the HTML script block
+            let safeJsonData = JSON.stringify(newBaseCodeData, null, 4).replace(/<\/script/gi, '<\\/script');
             
-            let blob = new Blob([htmlString], {type: 'text/html'});
+            let newBlock = "const baseCodeData = " + safeJsonData + ";";
+            
+            // FIX: Obfuscated Regex pattern to prevent self-matching script termination
+            const mStart = "// " + "--- BASE_CODE_DATA_START ---";
+            const mEnd = "// " + "--- BASE_CODE_DATA_END ---";
+            const regex = new RegExp(mStart.replace(/-/g, '\\-') + "[\\s\\S]*?" + mEnd.replace(/-/g, '\\-'));
+            
+            // FIX: Using a function replacement () => bypasses the $1 regex capture group string corruption bug
+            htmlString = htmlString.replace(regex, () => mStart + "\n        " + newBlock + "\n        " + mEnd);
+            
+            let blob = new Blob([htmlString], {type: 'text/html;charset=utf-8'});
             let a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = customAppName.replace(/\s+/g, '_') + '.html';
+            let url = URL.createObjectURL(blob);
+            a.href = url;
+            // Prevent illegal file character issues in the download name
+            a.download = customAppName.replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_') + '.html';
+            
+            // FIX: Appending link to body explicitly resolves the 'Edge Frame security origin' bug
+            document.body.appendChild(a); 
             a.click();
+            
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 150);
             
             showToast('Custom App Generated Successfully!');
             adminModal.classList.remove('visible');
