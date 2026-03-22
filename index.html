@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>QUIK MARK</title>
+    <title>QUIK DRAFT</title>
     <style>
         :root {
             --primary: #0284c7;
@@ -683,7 +683,7 @@
 </head>
 <body>
     <div class="header">
-        <h1 id="app-title">QUIK MARK</h1>
+        <h1 id="app-title">QUIK DRAFT</h1>
         <div class="header-actions">
             <div class="level-selector" id="level-selector">
                 <label class="level-option" data-level="upper_primary"><input type="radio" name="student-level" value="upper_primary">Upper Primary</label>
@@ -2136,7 +2136,7 @@
         document.getElementById('generate-app-btn').addEventListener('click', () => {
             if(!uploadedCSVRows) return;
             
-            const customAppName = document.getElementById('custom-app-name-input').value.trim() || 'QUIK MARK Custom';
+            const customAppName = document.getElementById('custom-app-name-input').value.trim() || 'QUIK DRAFT Custom';
             
             let newBaseCodeData = {};
             for(let i = 1; i < uploadedCSVRows.length; i++) {
