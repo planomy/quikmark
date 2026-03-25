@@ -2251,6 +2251,17 @@
         });
      document.getElementById("send-btn").addEventListener("click", async () => {
     alert("CLICKED");
+
+    const feedback = editor.innerText;
+    const row = window.currentRow || 2;
+
+    alert("ROW = " + row);
+
+    await QuikDraftSend.send(row, feedback);
+
+    alert("AFTER SEND");
+
+    showToast("Sent to student");
 });
 
     </script>
