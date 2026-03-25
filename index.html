@@ -2257,11 +2257,13 @@
 
     alert("ROW = " + row);
 
-    await QuikDraftSend.send(row, feedback);
-
-    alert("AFTER SEND");
-
-    showToast("Sent to student");
+    try {
+        await QuikDraftSend.send(row, feedback);
+        alert("AFTER SEND");
+        showToast("Sent to student");
+    } catch (err) {
+        alert("SEND ERROR: " + err.message);
+    }
 });
 
     </script>
