@@ -736,6 +736,7 @@
                     <div id="word-count-display" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 0.85rem; color: var(--text-light); font-weight: 700; white-space: nowrap;">0 words</div>
                     <div class="footer-group">
                         <button class="action-btn" id="copy-btn">Copy Feedback</button>
+                        <button class="action-btn success" id="send-btn">Send</button>
                     </div>
                 </div>
             </div>
@@ -2248,6 +2249,14 @@
                 });
             });
         });
+        document.getElementById("send-btn").addEventListener("click", async () => {
+    const feedback = editor.innerText;   // already exists in your file
+    const row = window.currentRow || 2;  // TEMP fallback
+
+    await QuikDraftSend.send(row, feedback);
+
+    showToast("Sent to student");
+});
 
     </script>
 </body>
