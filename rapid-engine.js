@@ -318,7 +318,7 @@ const RapidEngine = (function() {
    ========================================== */
 
 const QuikDraftSend = (function() {
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyulMqPg8Are8Zo_AeWA6N-R-wNl4DoCzgkT8YuuNQFSsTJPF6iKZ-_p5fR3kUu_-wJDQ/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwJtEWX4io8HAMgYfMaJZ-RlJ6xsUnDWHRM3nQt86bB6iJdmMgflmMSi5IpLDPnepsa3w/exec';
 
     async function sendFeedback(row, feedback) {
         if (!row || Number(row) < 2) {
