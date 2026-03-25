@@ -2249,13 +2249,8 @@
                 });
             });
         });
-        document.getElementById("send-btn").addEventListener("click", async () => {
-    const feedback = editor.innerText;
-    const row = window.currentRow || 2;
-
-    await QuikDraftSend.send(row, feedback);
-
-    showToast("Sent to student");
+     document.getElementById("send-btn").addEventListener("click", async () => {
+    alert("CLICKED");
 });
 
     </script>
