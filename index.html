@@ -737,6 +737,7 @@
                     <div class="footer-group">
                         <button class="action-btn" id="copy-btn">Copy Feedback</button>
                         <button class="action-btn success" id="send-btn">Send</button>
+                        <button class="action-btn" type="button" onclick="fetchNextSubmission()">FETCH</button>
                     </div>
                 </div>
             </div>
@@ -979,7 +980,37 @@
         const expandBtnStructure = document.getElementById('expand-btn-structure');
         const expandBtnExpression = document.getElementById('expand-btn-expression');
         const wordCountDisplay = document.getElementById('word-count-display');
+        const APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJtEWX4io8HAMgYfMaJZ-RlJ6xsUnDWHRM3nQt86bB6iJdmMgflmMSi5IpLDPnepsa3w/exec";
+        async function fetchNextSubmission() {
+    try {
+        const response = await fetch(APP_SCRIPT_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({
+                action: "fetchNext"
+            })
+        });
 
+        const data = await response.json();
+
+        if (!data.row) {
+            alert("No unprocessed submissions found.");
+            return;
+        }
+
+        window.currentRow = data.row;
+        editor.innerText = data.essay || "";
+        saveDraft();
+        updateWordCount();
+        showToast("Loaded row " + data.row);
+    } catch (err) {
+        console.error("FETCH failed:", err);
+        alert("Could not fetch next submission.");
+    }
+}
+        
         let activeTag = null;
         let hideToastTimer = null;
         let hoverTimer = null;
