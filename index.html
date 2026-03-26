@@ -996,15 +996,18 @@
 
         const data = await response.json();
 
-        if (!data.row) return;
+        if (!data.row) {
+            showToast("No unprocessed submissions found");
+            return;
+        }
 
         window.currentRow = data.row;
         editor.innerText = data.essay || "";
         saveDraft();
         updateWordCount();
-
     } catch (err) {
-        console.error(err);
+        console.error("FETCH failed:", err);
+        showToast("Fetch failed");
     }
 }
         
@@ -2278,17 +2281,20 @@
             });
         });
      document.getElementById("send-btn").addEventListener("click", async () => {
-    
-
     const feedback = editor.innerText;
-    const row = window.currentRow || 2;
+    const row = window.currentRow;
+
+    if (!row) {
+        showToast("Fetch a student first");
+        return;
+    }
 
     try {
         await window.QuikDraftSend.send(row, feedback);
-        
         showToast("Sent to student");
     } catch (err) {
-       
+        console.error("SEND failed:", err);
+        showToast("Send failed");
     }
 });
    // ===== TEMP: SET CURRENT ROW MANUALLY =====
